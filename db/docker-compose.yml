@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ice-mankora-db-container
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '5432:5432'
+    volumes:
+      - ice_mankora_db_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ice-mankora-db-pgadmin4
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '5050:80'
+    volumes:
+      - pgadmin_ice_mankora_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  ice_mankora_db_data:
+  pgadmin_ice_mankora_data:

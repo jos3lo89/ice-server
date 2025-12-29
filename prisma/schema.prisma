@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -18,1211 +12,764 @@ datasource db {
 // ENUMS
 // ============================================
 
-enum UserRole {
+enum user_role {
   ADMIN
   CAJERO
   MESERO
+  BARTENDER
+  COCINERO
 }
 
-enum CashMovementType {
-  INGRESO
-  EGRESO
-}
-
-enum TableStatus {
+enum table_status {
   LIBRE
   OCUPADA
   RESERVADA
+  LIMPIEZA
 }
 
-enum OrderStatus {
+enum order_status {
+  ABIERTA
+  CERRADA
+  PARCIALMENTE_PAGADA
+  PAGADA
+  CANCELADA
+}
+
+enum order_item_status {
   PENDIENTE
+  ENVIADO
   EN_PREPARACION
   LISTO
   ENTREGADO
-  CANCELADO
 }
 
-enum PaymentMethod {
+enum payment_method {
   EFECTIVO
-  TARJETA
+  TARJETA_VISA
+  TARJETA_MASTERCARD
+  TARJETA_AMEX
   YAPE
   PLIN
   TRANSFERENCIA
 }
 
-enum ComprobanteType {
-  TICKET // 00 - Nota de Venta
-  BOLETA // 03 - Boleta de Venta Electrónica
-  FACTURA // 01 - Factura Electrónica
+enum comprobante_type {
+  TICKET
+  BOLETA
+  FACTURA
 }
 
-enum CashRegisterStatus {
+enum estado_sunat {
+  NO_APLICA
+  PENDIENTE
+  ENVIANDO
+  ACEPTADO
+  RECHAZADO
+  OBSERVADO
+  ANULADO
+}
+
+enum tipo_documento_identidad {
+  SIN_DOC
+  DNI
+  CARNET_EXT
+  RUC
+  PASAPORTE
+}
+
+enum area_preparacion {
+  COCINA
+  BAR
+  BEBIDAS
+  CAJA
+}
+
+enum cash_register_status {
   ABIERTA
   CERRADA
 }
 
-enum AreaOrder {
-  COCINA
-  BEBIDAS
-  BAR
+enum cash_movement_type {
+  INGRESO
+  EGRESO
 }
 
-enum EstadoSunat {
-  PENDIENTE
-  ENVIADO
-  ACEPTADO
-  RECHAZADO
-  ANULADO
-}
-
-enum TipoDocumentoIdentidad {
-  DNI // 1
-  CARNET_EXT // 4
-  RUC // 6
-  PASAPORTE // 7
-  SIN_DOC // 0
-}
-
-enum TipoNotaCredito {
-  ANULACION_OPERACION // 01
-  ANULACION_ERROR_RUC // 02
-  CORRECCION_ERROR_DESCRIPCION // 03
-  DESCUENTO_GLOBAL // 04
-  DESCUENTO_ITEM // 05
-  DEVOLUCION_TOTAL // 06
-  DEVOLUCION_ITEM // 07
-  BONIFICACION // 08
-  DISMINUCION_VALOR // 09
-  OTROS // 10
-}
-
-enum TipoNotaDebito {
-  INTERES_MORA // 01
-  AUMENTO_VALOR // 02
-  PENALIDADES // 03
-  OTROS // 10
+enum tipo_nota_credito {
+  ANULACION_OPERACION
+  ANULACION_ERROR_RUC
+  CORRECCION_DESCRIPCION
+  DESCUENTO_GLOBAL
+  DESCUENTO_ITEM
+  DEVOLUCION_TOTAL
+  DEVOLUCION_ITEM
+  BONIFICACION
+  DISMINUCION_VALOR
+  OTROS
 }
 
 // ============================================
-// CONFIGURACIÓN DEL SISTEMA
+// MODELS
 // ============================================
 
-model SystemConfig {
-  key         String   @id
-  value       String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("system_config")
+/// Configuración del sistema (key-value)
+model system_config {
+  key         String   @id @db.VarChar(100)
+  value       String   @db.Text
+  description String?  @db.VarChar(500)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 }
 
-// ============================================
-// EMPRESA (DATOS DEL RESTAURANT)
-// ============================================
+/// Correlativos de comprobantes SUNAT
+model correlatives {
+  id                 String   @id @default(uuid()) @db.Uuid
+  tipo_documento     String   @db.VarChar(2)
+  serie              String   @db.VarChar(4)
+  correlativo_actual Int      @default(0)
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-model Company {
-  id              String  @id @default(uuid())
-  ruc             String  @unique @db.VarChar(11)
-  razonSocial     String  @db.VarChar(255)
-  nombreComercial String? @db.VarChar(255)
-  direccion       String  @db.VarChar(500)
-  ubigeo          String  @db.VarChar(6)
-  distrito        String  @db.VarChar(100)
-  provincia       String  @db.VarChar(100)
-  departamento    String  @db.VarChar(100)
-  telefono        String? @db.VarChar(20)
-  email           String? @db.VarChar(100)
-  web             String? @db.VarChar(255)
-
-  // Configuración SUNAT
-  usuarioSol          String  @db.VarChar(50)
-  claveSol            String  @db.VarChar(100)
-  certificadoPem      String? @db.Text
-  certificadoPassword String? @db.VarChar(100)
-
-  // Endpoints SUNAT
-  endpointBeta       String? @db.VarChar(500)
-  endpointProduccion String? @db.VarChar(500)
-  modoProduccion     Boolean @default(false)
-
-  // Logo y configuración
-  logoPath String? @db.VarChar(500)
-  activo   Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  branches       Branch[]
-  configurations CompanyConfiguration[]
-  invoices       Invoice[]
-  boletas        Boleta[]
-  notasCredito   NotaCredito[]
-  notasDebito    NotaDebito[]
-  dailySummaries DailySummary[]
-
-  @@map("companies")
+  @@unique([tipo_documento, serie])
 }
 
-// ============================================
-// CONFIGURACIONES ESPECÍFICAS POR EMPRESA
-// ============================================
-
-enum ConfigType {
-  TAX_SETTINGS
-  INVOICE_SETTINGS
-  DOCUMENT_SETTINGS
-}
-
-enum Environment {
-  GENERAL
-  BETA
-  PRODUCCION
-}
-
-model CompanyConfiguration {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  configType  ConfigType
-  environment Environment @default(GENERAL)
-  configData  Json // Datos de configuración flexibles
-
-  isActive    Boolean @default(true)
-  description String? @db.VarChar(255)
-  priority    Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([companyId, configType, environment])
-  @@index([companyId, configType])
-  @@map("company_configurations")
-}
-
-// ============================================
-// SUCURSALES (PISOS DEL RESTAURANT)
-// ============================================
-
-model Branch {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  codigo       String  @db.VarChar(10)
-  nombre       String  @db.VarChar(255)
-  direccion    String  @db.VarChar(500)
-  ubigeo       String  @db.VarChar(6)
-  distrito     String  @db.VarChar(100)
-  provincia    String  @db.VarChar(100)
-  departamento String  @db.VarChar(100)
-  telefono     String? @db.VarChar(20)
-  email        String? @db.VarChar(100)
-
-  // Series documentarias (JSON arrays)
-  seriesFactura     Json? // ["F001", "F002"]
-  seriesBoleta      Json? // ["B001", "B002"]
-  seriesNotaCredito Json? // ["FC01", "BC01"]
-  seriesNotaDebito  Json? // ["FD01", "BD01"]
-
-  activo    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  floors       Floor[]
-  correlatives Correlative[]
-  invoices     Invoice[]
-  boletas      Boleta[]
-  notasCredito NotaCredito[]
-  notasDebito  NotaDebito[]
-
-  @@unique([companyId, codigo])
-  @@map("branches")
-}
-
-// ============================================
-// CORRELATIVOS DE SERIES
-// ============================================
-
-model Correlative {
-  id       String @id @default(uuid())
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  tipoDocumento     String @db.VarChar(2) // 01=Factura, 03=Boleta, 07=NC, 08=ND
-  serie             String @db.VarChar(4)
-  correlativoActual Int    @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([branchId, tipoDocumento, serie])
-  @@index([branchId, tipoDocumento])
-  @@map("correlatives")
-}
-
-// ============================================
-// PISOS
-// ============================================
-
-model Floor {
-  id       String @id @default(uuid())
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  name     String
-  level    Int
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tables     Table[]
-  users      User[]
-  categories Category[]
-
-  @@unique([branchId, level])
-  @@map("floors")
-}
-
-// ============================================
-// USUARIOS
-// ============================================
-
-model User {
-  id       String   @id @default(uuid())
-  name     String
-  dni      String   @unique
-  username String   @unique
-  password String
-  role     UserRole @default(MESERO)
-  isActive Boolean  @default(true)
-
-  lastLoginAt         DateTime?
-  lastLoginIp         String?   @db.VarChar(45)
-  failedLoginAttempts Int       @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  floors                  Floor[]
-  orders                  Order[]
-  sales                   Sale[]
-  sessions                CashRegister[]
-  invoices                Invoice[]
-  boletas                 Boleta[]
-  notasCredito            NotaCredito[]
-  notasDebito             NotaDebito[]
-  authorizedCancellations OrderCancellation[] @relation("AuthorizedBy")
-
-  @@map("users")
-}
-
-// ============================================
-// CATEGORÍAS DE PRODUCTOS
-// ============================================
-
-model Category {
-  id       String  @id @default(uuid())
-  name     String
-  slug     String
-  parentId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  parent   Category?  @relation("SubCategories", fields: [parentId], references: [id])
-  children Category[] @relation("SubCategories")
-  products Product[]
-  floors   Floor[]
-
-  @@map("categories")
-}
-
-// ============================================
-// PRODUCTOS
-// ============================================
-
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-
-  // Código SUNAT (catálogo 25)
-  unidadMedida   String  @default("NIU") @db.VarChar(3) // NIU=Unidad, ZZ=Servicio
-  codigoProducto String? @db.VarChar(30) // Código interno
-  codigoSunat    String? @db.VarChar(30) // Código SUNAT si aplica
-
-  // Impuestos
-  afectacionIgv String @default("10") @db.VarChar(2) // 10=Gravado, 20=Exonerado, 30=Inafecto
-
-  isStockManaged Boolean   @default(true)
-  stockDaily     Int       @default(0)
-  stockWarehouse Int       @default(0)
-  isActive       Boolean   @default(true)
-  areaOrder      AreaOrder @default(COCINA)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  orderItems       OrderItem[]
-  variants         ProductVariant[]
-  invoiceItems     InvoiceItem[]
-  boletaItems      BoletaItem[]
-  notaCreditoItems NotaCreditoItem[]
-  notaDebitoItems  NotaDebitoItem[]
-
-  @@index([categoryId])
-  @@index([codigoProducto])
-  @@map("products")
-}
-
-// ============================================
-// VARIANTES DEL PRODUCTO
-// ============================================
-
-model ProductVariant {
-  id         String  @id @default(uuid())
-  name       String
-  priceExtra Decimal @default(0.00) @db.Decimal(10, 2)
-  isActive   Boolean @default(true)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("product_variants")
-}
-
-// ============================================
-// MESAS
-// ============================================
-
-model Table {
-  id       String      @id @default(uuid())
-  number   Int
-  name     String
-  status   TableStatus @default(LIBRE)
-  capacity Int         @default(4)
-  isActive Boolean     @default(true)
-
-  floorId String
-  floor   Floor  @relation(fields: [floorId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  orders Order[]
-
-  @@unique([floorId, number])
-  @@index([floorId, status])
-  @@map("tables")
-}
-
-// ============================================
-// ÓRDENES (COMANDAS)
-// ============================================
-
-model Order {
-  id          String      @id @default(uuid())
-  status      OrderStatus @default(PENDIENTE)
-  dailyNumber Int
-  orderDate   DateTime    @default(now())
-
-  tableId String
-  table   Table  @relation(fields: [tableId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  notes String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items             OrderItem[]
-  sale              Sale?
-  orderCancellation OrderCancellation?
-
-  @@unique([dailyNumber, orderDate, tableId])
-  @@index([orderDate, dailyNumber])
-  @@index([tableId, status])
-  @@map("orders")
-}
-
-model OrderCancellation {
-  id     String @id @default(uuid())
-  reason String @db.Text
-
-  orderId String @unique
-  order   Order  @relation(fields: [orderId], references: [id])
-
-  authorizedById String?
-  authorizedBy   User?   @relation("AuthorizedBy", fields: [authorizedById], references: [id])
-
-  cancelledAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("order_cancellations")
-}
-
-model OrderItem {
-  id String @id @default(uuid())
-
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  quantity       Int
-  price          Decimal @db.Decimal(10, 2)
-  notes          String? @db.Text
-  variantsDetail Json? // Detalles de variantes seleccionadas
-
-  isActive  Boolean   @default(true)
-  areaOrder AreaOrder @default(COCINA)
-  isPrinted Boolean   @default(false) // Para control de impresión en cocina
-  printedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  saleId String?
-  sale   Sale?   @relation(fields: [saleId], references: [id])
-
-  @@index([orderId])
-  @@index([productId])
-  @@index([areaOrder, isPrinted])
-  @@map("order_items")
-}
-
-// ============================================
-// CLIENTES
-// ============================================
-
-model Client {
-  id              String                 @id @default(uuid())
-  tipoDocumento   TipoDocumentoIdentidad @default(SIN_DOC)
-  numeroDocumento String                 @unique @db.VarChar(15)
-  razonSocial     String                 @db.VarChar(500)
-  nombreComercial String?                @db.VarChar(255)
-
-  direccion    String? @db.VarChar(500)
-  ubigeo       String? @db.VarChar(6)
-  distrito     String? @db.VarChar(100)
-  provincia    String? @db.VarChar(100)
-  departamento String? @db.VarChar(100)
-
-  email    String? @db.VarChar(100)
-  telefono String? @db.VarChar(20)
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sales        Sale[]
-  invoices     Invoice[]
-  boletas      Boleta[]
-  notasCredito NotaCredito[]
-  notasDebito  NotaDebito[]
-
-  @@index([tipoDocumento, numeroDocumento])
-  @@index([razonSocial])
-  @@map("clients")
-}
-
-// ============================================
-// VENTAS (RELACIÓN CON ÓRDENES)
-// ============================================
-
-model Sale {
-  id                String          @id @default(uuid())
-  type              ComprobanteType
-  serie             String          @db.VarChar(4)
-  correlativo       Int
-  numeroComprobante String          @unique
-
-  fechaEmision DateTime @default(now())
-  tipoMoneda   String   @default("PEN") @db.VarChar(3)
-
-  // Pagos
-  montoPagado   Decimal?      @db.Decimal(12, 2)
-  vuelto        Decimal?      @db.Decimal(12, 2)
-  paymentMethod PaymentMethod
-  formaPago     String        @default("Contado") @db.VarChar(20)
-  cuotas        Json?
-
-  // Montos calculados
-  montoGravado     Decimal @default(0.00) @db.Decimal(12, 2)
-  montoExonerado   Decimal @default(0.00) @db.Decimal(12, 2)
-  montoInafecto    Decimal @default(0.00) @db.Decimal(12, 2)
-  igv              Decimal @default(0.00) @db.Decimal(12, 2)
-  icbper           Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos   Decimal @default(0.00) @db.Decimal(12, 2)
-  valorVenta       Decimal @default(0.00) @db.Decimal(12, 2)
-  precioVentaTotal Decimal @default(0.00) @db.Decimal(12, 2)
-
-  montoLetras   String @db.VarChar(255)
-  itemsSnapshot Json // Snapshot de items al momento de la venta
-
-  // Archivos generados
-  xmlFileName String? @db.VarChar(255)
-  xmlPath     String? @db.VarChar(500)
-  pdfPath     String? @db.VarChar(500)
-  cdrPath     String? @db.VarChar(500)
-
-  // Respuesta SUNAT (si aplica)
-  cdrCode        String? @db.VarChar(10)
-  cdrDescription String? @db.Text
-  cdrNotes       String? @db.Text
-  hash           String? @db.VarChar(100)
-  errorCodigo    String? @db.VarChar(10)
-  errorMensaje   String? @db.Text
-
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// Pisos del restaurante
+model floors {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @db.VarChar(100)
+  level       Int      @unique
+  description String?  @db.VarChar(255)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   // Relaciones
-  orderId String? @unique
-  order   Order?  @relation(fields: [orderId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  clientId String?
-  client   Client? @relation(fields: [clientId], references: [id])
-
-  orderItems OrderItem[]
-
-  // Relación con documentos electrónicos
-  invoiceId String?  @unique
-  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
-
-  boletaId String? @unique
-  boleta   Boleta? @relation(fields: [boletaId], references: [id])
-
-  @@index([fechaEmision])
-  @@index([numeroComprobante])
-  @@index([userId])
-  @@index([clientId])
-  @@map("sales")
+  tables      tables[]
+  user_floors user_floors[]
 }
 
-// ============================================
-// FACTURAS ELECTRÓNICAS (Tipo 01)
-// ============================================
-
-model Invoice {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
-
-  // Identificación
-  tipoDocumento  String @default("01") @db.VarChar(2)
-  serie          String @db.VarChar(4)
-  correlativo    String @db.VarChar(8)
-  numeroCompleto String @unique @db.VarChar(15) // F001-00000001
-
-  // Fechas
-  fechaEmision     DateTime  @default(now())
-  fechaVencimiento DateTime?
-
-  // Configuración UBL
-  ublVersion    String @default("2.1") @db.VarChar(3)
-  tipoOperacion String @default("0101") @db.VarChar(4)
-  moneda        String @default("PEN") @db.VarChar(3)
-
-  // Forma de pago
-  formaPagoTipo   String @default("Contado") @db.VarChar(20)
-  formaPagoCuotas Json?
-
-  // Montos calculados
-  valorVenta         Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGravadas    Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperExoneradas  Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperInafectas   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperExportacion Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGratuitas   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgvGratuitas    Decimal @default(0.00) @db.Decimal(10, 2)
-  mtoIgv             Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIsc             Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIcbper          Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOtrosTributos   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoBaseIvap        Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIvap            Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoDetraccion      Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoPercepcion      Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoRetencion       Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos     Decimal @default(0.00) @db.Decimal(12, 2)
-  subTotal           Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoImpVenta        Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoAnticipos       Decimal @default(0.00) @db.Decimal(12, 2)
-
-  // Detalles JSON
-  leyendas               Json?
-  guias                  Json?
-  documentosRelacionados Json?
-  detraccion             Json?
-  percepcion             Json?
-  retencion              Json?
-  datosAdicionales       Json?
-
-  // Archivos
-  xmlPath String? @db.VarChar(500)
-  cdrPath String? @db.VarChar(500)
-  pdfPath String? @db.VarChar(500)
-
-  // Estado SUNAT
-  estadoSunat    EstadoSunat @default(PENDIENTE)
-  respuestaSunat String?     @db.Text
-  codigoHash     String?     @db.VarChar(100)
-
-  // Consulta CPE
-  consultaCpeEstado    String?   @db.VarChar(50)
-  consultaCpeRespuesta Json?
-  consultaCpeFecha     DateTime?
-
-  // Auditoría
-  usuarioCreacion String? @db.VarChar(100)
-  userId          String
-  user            User    @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// Impresoras térmicas
+model printers {
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @db.VarChar(100)
+  type            String           @db.VarChar(50)
+  connection_type String           @db.VarChar(20)
+  address         String?          @db.VarChar(255)
+  area            area_preparacion
+  is_default      Boolean          @default(false)
+  is_active       Boolean          @default(true)
+  created_at      DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
 
   // Relaciones
-  items        InvoiceItem[]
-  notasCredito NotaCredito[] @relation("FacturaReferencia")
-  notasDebito  NotaDebito[]  @relation("FacturaReferencia")
-  sale         Sale?
-
-  @@unique([companyId, serie, correlativo])
-  @@index([companyId, branchId])
-  @@index([fechaEmision])
-  @@index([estadoSunat])
-  @@index([numeroCompleto])
-  @@map("invoices")
+  order_items order_items[]
 }
 
-model InvoiceItem {
-  id        String  @id @default(uuid())
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+/// Usuarios del sistema
+model users {
+  id                    String    @id @default(uuid()) @db.Uuid
+  name                  String    @db.VarChar(255)
+  dni                   String    @unique @db.VarChar(8)
+  username              String    @unique @db.VarChar(50)
+  password_hash         String    @db.VarChar(255)
+  role                  user_role @default(MESERO)
+  pin                   String?   @db.VarChar(6)
+  is_active             Boolean   @default(true)
+  last_login_at         DateTime? @db.Timestamptz(6)
+  last_login_ip         String?   @db.VarChar(45)
+  failed_login_attempts Int       @default(0)
+  locked_until          DateTime? @db.Timestamptz(6)
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  cantidad       Decimal @db.Decimal(12, 3)
-  unidadMedida   String  @db.VarChar(3)
-  codigoProducto String? @db.VarChar(30)
-  descripcion    String  @db.VarChar(500)
-
-  // Precios
-  mtoValorUnitario  Decimal @db.Decimal(12, 10)
-  mtoPrecioUnitario Decimal @db.Decimal(12, 10)
-  mtoValorVenta     Decimal @db.Decimal(12, 2)
-
-  // Impuestos
-  afectacionIgv  String  @db.VarChar(2)
-  porcentajeIgv  Decimal @default(18.00) @db.Decimal(5, 2)
-  mtoBaseIgv     Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv         Decimal @default(0.00) @db.Decimal(12, 2)
-  tipoSistemaIsc String? @db.VarChar(2)
-  mtoIsc         Decimal @default(0.00) @db.Decimal(12, 2)
-  icbper         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos Decimal @default(0.00) @db.Decimal(12, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([invoiceId])
-  @@map("invoice_items")
+  // Relaciones
+  user_floors           user_floors[]
+  orders                orders[]
+  order_items_created   order_items[]    @relation("CreatedBy")
+  order_items_cancelled order_items[]    @relation("CancelledBy")
+  cash_registers        cash_registers[]
+  cash_movements        cash_movements[]
+  payments              payments[]
+  sales                 sales[]
+  credit_notes          credit_notes[]
+  audit_logs            audit_logs[]
 }
 
-// ============================================
-// BOLETAS ELECTRÓNICAS (Tipo 03)
-// ============================================
+/// Relación usuarios-pisos (muchos a muchos)
+model user_floors {
+  user_id  String @db.Uuid
+  floor_id String @db.Uuid
 
-model Boleta {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user  users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  floor floors @relation(fields: [floor_id], references: [id], onDelete: Cascade)
 
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
-
-  dailySummaryId String?
-  dailySummary   DailySummary? @relation(fields: [dailySummaryId], references: [id])
-
-  // Identificación
-  tipoDocumento  String @default("03") @db.VarChar(2)
-  serie          String @db.VarChar(4)
-  correlativo    String @db.VarChar(8)
-  numeroCompleto String @unique @db.VarChar(15)
-
-  fechaEmision DateTime @default(now())
-
-  // Configuración
-  ublVersion    String @default("2.1") @db.VarChar(3)
-  tipoOperacion String @default("0101") @db.VarChar(4)
-  moneda        String @default("PEN") @db.VarChar(3)
-  metodoEnvio   String @default("individual") @db.VarChar(20)
-
-  // Montos
-  valorVenta        Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGravadas   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperExoneradas Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperInafectas  Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGratuitas  Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgvGratuitas   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv            Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoBaseIvap       Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIvap           Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIsc            Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIcbper         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos    Decimal @default(0.00) @db.Decimal(12, 2)
-  subTotal          Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoImpVenta       Decimal @default(0.00) @db.Decimal(12, 2)
-
-  // JSON
-  leyendas         Json?
-  datosAdicionales Json?
-
-  // Archivos
-  xmlPath String? @db.VarChar(500)
-  cdrPath String? @db.VarChar(500)
-  pdfPath String? @db.VarChar(500)
-
-  // Estado
-  estadoSunat    EstadoSunat @default(PENDIENTE)
-  respuestaSunat String?     @db.Text
-  codigoHash     String?     @db.VarChar(100)
-
-  consultaCpeEstado    String?   @db.VarChar(50)
-  consultaCpeRespuesta Json?
-  consultaCpeFecha     DateTime?
-
-  usuarioCreacion String? @db.VarChar(100)
-  userId          String
-  user            User    @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items        BoletaItem[]
-  notasCredito NotaCredito[] @relation("BoletaReferencia")
-  sale         Sale?
-
-  @@unique([companyId, serie, correlativo])
-  @@index([companyId, branchId])
-  @@index([fechaEmision])
-  @@index([estadoSunat])
-  @@index([dailySummaryId])
-  @@map("boletas")
+  @@id([user_id, floor_id])
 }
 
-model BoletaItem {
-  id       String @id @default(uuid())
-  boletaId String
-  boleta   Boleta @relation(fields: [boletaId], references: [id], onDelete: Cascade)
+/// Categorías de productos (jerárquica)
+model categories {
+  id            String           @id @default(uuid()) @db.Uuid
+  name          String           @db.VarChar(100)
+  slug          String           @db.VarChar(100)
+  description   String?          @db.VarChar(255)
+  parent_id     String?          @db.Uuid
+  level         Int              @default(0)
+  default_area  area_preparacion @default(COCINA)
+  display_order Int              @default(0)
+  icon          String?          @db.VarChar(50)
+  color         String?          @db.VarChar(7)
+  image_path    String?          @db.VarChar(500)
+  is_active     Boolean          @default(true)
+  created_at    DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  // Relaciones
+  parent   categories?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: SetNull)
+  children categories[] @relation("CategoryHierarchy")
+  products products[]
 
-  cantidad       Decimal @db.Decimal(12, 3)
-  unidadMedida   String  @db.VarChar(3)
-  codigoProducto String? @db.VarChar(30)
-  descripcion    String  @db.VarChar(500)
-
-  mtoValorUnitario  Decimal @db.Decimal(12, 10)
-  mtoPrecioUnitario Decimal @db.Decimal(12, 10)
-  mtoValorVenta     Decimal @db.Decimal(12, 2)
-
-  afectacionIgv  String  @db.VarChar(2)
-  porcentajeIgv  Decimal @default(18.00) @db.Decimal(5, 2)
-  mtoBaseIgv     Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv         Decimal @default(0.00) @db.Decimal(12, 2)
-  icbper         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos Decimal @default(0.00) @db.Decimal(12, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([boletaId])
-  @@map("boleta_items")
+  @@index([parent_id], name: "idx_categories_parent")
+  @@index([slug], name: "idx_categories_slug")
 }
 
-// ============================================
-// NOTAS DE CRÉDITO (Tipo 07)
-// ============================================
+/// Productos del menú
+model products {
+  id               String           @id @default(uuid()) @db.Uuid
+  category_id      String           @db.Uuid
+  name             String           @db.VarChar(255)
+  short_name       String?          @db.VarChar(50)
+  description      String?          @db.Text
+  price            Decimal          @db.Decimal(10, 2)
+  cost             Decimal          @default(0) @db.Decimal(10, 2)
+  unidad_medida    String           @default("NIU") @db.VarChar(3)
+  codigo_producto  String?          @db.VarChar(30)
+  afectacion_igv   String           @default("10") @db.VarChar(2)
+  aplica_icbper    Boolean          @default(false)
+  area_preparacion area_preparacion
+  is_stock_managed Boolean          @default(false)
+  stock_actual     Int              @default(0)
+  stock_minimo     Int              @default(0)
+  image_path       String?          @db.VarChar(500)
+  display_order    Int              @default(0)
+  is_available     Boolean          @default(true)
+  is_active        Boolean          @default(true)
+  is_featured      Boolean          @default(false)
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
 
-model NotaCredito {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // Relaciones
+  category          categories          @relation(fields: [category_id], references: [id])
+  variant_groups    variant_groups[]
+  order_items       order_items[]
+  sale_items        sale_items[]
+  credit_note_items credit_note_items[]
 
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
-
-  // Identificación
-  tipoDocumento  String @default("07") @db.VarChar(2)
-  serie          String @db.VarChar(4)
-  correlativo    String @db.VarChar(8)
-  numeroCompleto String @unique @db.VarChar(15)
-
-  fechaEmision DateTime @default(now())
-
-  // Documento relacionado
-  tipoDocumentoRel  String @db.VarChar(2) // 01=Factura, 03=Boleta
-  serieRel          String @db.VarChar(4)
-  correlativoRel    String @db.VarChar(8)
-  numeroCompletoRel String @db.VarChar(15)
-
-  facturaId String?
-  factura   Invoice? @relation("FacturaReferencia", fields: [facturaId], references: [id])
-
-  boletaId String?
-  boleta   Boleta? @relation("BoletaReferencia", fields: [boletaId], references: [id])
-
-  // Tipo y motivo
-  tipoNotaCredito TipoNotaCredito
-  motivoNota      String          @db.VarChar(500)
-
-  // Configuración
-  ublVersion    String @default("2.1") @db.VarChar(3)
-  tipoOperacion String @default("0101") @db.VarChar(4)
-  moneda        String @default("PEN") @db.VarChar(3)
-
-  // Montos
-  valorVenta        Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGravadas   Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperExoneradas Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperInafectas  Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv            Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIcbper         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos    Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoImpVenta       Decimal @default(0.00) @db.Decimal(12, 2)
-
-  // JSON
-  leyendas         Json?
-  datosAdicionales Json?
-
-  // Archivos
-  xmlPath String? @db.VarChar(500)
-  cdrPath String? @db.VarChar(500)
-  pdfPath String? @db.VarChar(500)
-
-  // Estado
-  estadoSunat    EstadoSunat @default(PENDIENTE)
-  respuestaSunat String?     @db.Text
-  codigoHash     String?     @db.VarChar(100)
-
-  usuarioCreacion String? @db.VarChar(100)
-  userId          String
-  user            User    @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items NotaCreditoItem[]
-
-  @@unique([companyId, serie, correlativo])
-  @@index([companyId, branchId])
-  @@index([fechaEmision])
-  @@index([facturaId])
-  @@index([boletaId])
-  @@map("notas_credito")
+  @@index([category_id], name: "idx_products_category")
+  @@index([area_preparacion], name: "idx_products_area")
+  @@index([is_active, is_available], name: "idx_products_active")
 }
 
-model NotaCreditoItem {
-  id            String      @id @default(uuid())
-  notaCreditoId String
-  notaCredito   NotaCredito @relation(fields: [notaCreditoId], references: [id], onDelete: Cascade)
+/// Grupos de variantes de productos
+model variant_groups {
+  id             String   @id @default(uuid()) @db.Uuid
+  product_id     String   @db.Uuid
+  name           String   @db.VarChar(100)
+  is_required    Boolean  @default(false)
+  max_selections Int      @default(1)
+  display_order  Int      @default(0)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  // Relaciones
+  product products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  options variant_options[]
 
-  cantidad       Decimal @db.Decimal(12, 3)
-  unidadMedida   String  @db.VarChar(3)
-  codigoProducto String? @db.VarChar(30)
-  descripcion    String  @db.VarChar(500)
-
-  mtoValorUnitario  Decimal @db.Decimal(12, 10)
-  mtoPrecioUnitario Decimal @db.Decimal(12, 10)
-  mtoValorVenta     Decimal @db.Decimal(12, 2)
-
-  afectacionIgv  String  @db.VarChar(2)
-  mtoBaseIgv     Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv         Decimal @default(0.00) @db.Decimal(12, 2)
-  icbper         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos Decimal @default(0.00) @db.Decimal(12, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([notaCreditoId])
-  @@map("nota_credito_items")
+  @@index([product_id], name: "idx_variant_groups_product")
 }
 
-// ============================================
-// NOTAS DE DÉBITO (Tipo 08)
-// ============================================
+/// Opciones de variantes
+model variant_options {
+  id               String   @id @default(uuid()) @db.Uuid
+  variant_group_id String   @db.Uuid
+  name             String   @db.VarChar(100)
+  price_modifier   Decimal  @default(0) @db.Decimal(10, 2)
+  is_default       Boolean  @default(false)
+  is_active        Boolean  @default(true)
+  display_order    Int      @default(0)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
 
-model NotaDebito {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // Relaciones
+  variant_group variant_groups @relation(fields: [variant_group_id], references: [id], onDelete: Cascade)
 
-  branchId String
-  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
-
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
-
-  tipoDocumento  String @default("08") @db.VarChar(2)
-  serie          String @db.VarChar(4)
-  correlativo    String @db.VarChar(8)
-  numeroCompleto String @unique @db.VarChar(15)
-
-  fechaEmision DateTime @default(now())
-
-  // Documento relacionado
-  tipoDocumentoRel  String @db.VarChar(2)
-  serieRel          String @db.VarChar(4)
-  correlativoRel    String @db.VarChar(8)
-  numeroCompletoRel String @db.VarChar(15)
-
-  facturaId String?
-  factura   Invoice? @relation("FacturaReferencia", fields: [facturaId], references: [id])
-
-  // Tipo y motivo
-  tipoNotaDebito TipoNotaDebito
-  motivoNota     String         @db.VarChar(500)
-
-  // Configuración
-  ublVersion    String @default("2.1") @db.VarChar(3)
-  tipoOperacion String @default("0101") @db.VarChar(4)
-  moneda        String @default("PEN") @db.VarChar(3)
-
-  // Montos
-  valorVenta      Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoOperGravadas Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv          Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos  Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoImpVenta     Decimal @default(0.00) @db.Decimal(12, 2)
-
-  // JSON
-  leyendas         Json?
-  datosAdicionales Json?
-
-  // Archivos
-  xmlPath String? @db.VarChar(500)
-  cdrPath String? @db.VarChar(500)
-  pdfPath String? @db.VarChar(500)
-
-  // Estado
-  estadoSunat    EstadoSunat @default(PENDIENTE)
-  respuestaSunat String?     @db.Text
-  codigoHash     String?     @db.VarChar(100)
-
-  usuarioCreacion String? @db.VarChar(100)
-  userId          String
-  user            User    @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  items NotaDebitoItem[]
-
-  @@unique([companyId, serie, correlativo])
-  @@index([companyId, branchId])
-  @@index([facturaId])
-  @@map("notas_debito")
+  @@index([variant_group_id], name: "idx_variant_options_group")
 }
 
-model NotaDebitoItem {
-  id           String     @id @default(uuid())
-  notaDebitoId String
-  notaDebito   NotaDebito @relation(fields: [notaDebitoId], references: [id], onDelete: Cascade)
+/// Mesas del restaurante
+model tables {
+  id         String       @id @default(uuid()) @db.Uuid
+  floor_id   String       @db.Uuid
+  number     Int
+  name       String?      @db.VarChar(50)
+  capacity   Int          @default(4)
+  status     table_status @default(LIBRE)
+  pos_x      Int          @default(0)
+  pos_y      Int          @default(0)
+  is_active  Boolean      @default(true)
+  created_at DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  // Relaciones
+  floor        floors         @relation(fields: [floor_id], references: [id], onDelete: Cascade)
+  orders       orders[]
+  reservations reservations[]
 
-  cantidad       Decimal @db.Decimal(12, 3)
-  unidadMedida   String  @db.VarChar(3)
-  codigoProducto String? @db.VarChar(30)
-  descripcion    String  @db.VarChar(500)
-
-  mtoValorUnitario  Decimal @db.Decimal(12, 10)
-  mtoPrecioUnitario Decimal @db.Decimal(12, 10)
-  mtoValorVenta     Decimal @db.Decimal(12, 2)
-
-  afectacionIgv  String  @db.VarChar(2)
-  mtoBaseIgv     Decimal @default(0.00) @db.Decimal(12, 2)
-  mtoIgv         Decimal @default(0.00) @db.Decimal(12, 2)
-  totalImpuestos Decimal @default(0.00) @db.Decimal(12, 2)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([notaDebitoId])
-  @@map("nota_debito_items")
+  @@unique([floor_id, number])
+  @@index([floor_id, status], name: "idx_tables_floor_status")
 }
 
-// ============================================
-// RESÚMENES DIARIOS (RC)
-// ============================================
+/// Clientes para facturación
+model clients {
+  id               String                   @id @default(uuid()) @db.Uuid
+  tipo_documento   tipo_documento_identidad @default(SIN_DOC)
+  numero_documento String                   @db.VarChar(15)
+  razon_social     String                   @db.VarChar(500)
+  nombre_comercial String?                  @db.VarChar(255)
+  direccion        String?                  @db.VarChar(500)
+  ubigeo           String?                  @db.VarChar(6)
+  email            String?                  @db.VarChar(100)
+  telefono         String?                  @db.VarChar(20)
+  total_purchases  Decimal                  @default(0) @db.Decimal(12, 2)
+  visit_count      Int                      @default(0)
+  last_visit_at    DateTime?                @db.Timestamptz(6)
+  is_active        Boolean                  @default(true)
+  created_at       DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime                 @default(now()) @updatedAt @db.Timestamptz(6)
 
-model DailySummary {
-  id        String  @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // Relaciones
+  sales        sales[]
+  credit_notes credit_notes[]
 
-  // Identificación
-  identificador   String   @unique @db.VarChar(20) // RC-20241228-001
-  fechaEmision    DateTime @default(now())
-  fechaReferencia DateTime // Fecha de las boletas incluidas
-
-  // Archivos
-  xmlPath String? @db.VarChar(500)
-  cdrPath String? @db.VarChar(500)
-
-  // Estado
-  estadoSunat    EstadoSunat @default(PENDIENTE)
-  respuestaSunat String?     @db.Text
-  ticket         String?     @db.VarChar(50) // Ticket SUNAT
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  boletas Boleta[]
-
-  @@index([fechaReferencia])
-  @@index([estadoSunat])
-  @@map("daily_summaries")
+  @@unique([tipo_documento, numero_documento])
+  @@index([numero_documento], name: "idx_clients_documento")
 }
 
-// ============================================
-// CAJA REGISTRADORA
-// ============================================
+/// Órdenes (comandas)
+model orders {
+  id                  String       @id @default(uuid()) @db.Uuid
+  daily_number        Int
+  order_date          DateTime     @default(now()) @db.Date
+  table_id            String       @db.Uuid
+  user_id             String       @db.Uuid
+  status              order_status @default(ABIERTA)
+  diners_count        Int          @default(1)
+  notes               String?      @db.Text
+  subtotal            Decimal      @default(0) @db.Decimal(12, 2)
+  total_cancelled     Decimal      @default(0) @db.Decimal(12, 2)
+  total_paid          Decimal      @default(0) @db.Decimal(12, 2)
+  total_pending       Decimal      @default(0) @db.Decimal(12, 2)
+  is_split_payment    Boolean      @default(false)
+  split_payment_count Int          @default(0)
+  created_at          DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
 
-model CashRegister {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  // Relaciones
+  table         tables          @relation(fields: [table_id], references: [id])
+  user          users           @relation(fields: [user_id], references: [id])
+  order_items   order_items[]
+  payments      payments[]
+  sales         sales[]
+  order_history order_history[]
 
-  openTime  DateTime  @default(now())
-  closeTime DateTime?
-
-  initialMoney Decimal  @db.Decimal(10, 2)
-  systemMoney  Decimal? @db.Decimal(10, 2)
-  finalMoney   Decimal? @db.Decimal(10, 2)
-  difference   Decimal? @db.Decimal(10, 2)
-
-  status CashRegisterStatus @default(ABIERTA)
-  notes  String?            @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  movements CashMovement[]
-
-  @@index([userId, status])
-  @@index([openTime])
-  @@map("cash_registers")
+  @@unique([daily_number, order_date])
+  @@index([order_date, daily_number], name: "idx_orders_date")
+  @@index([table_id, status], name: "idx_orders_table")
+  @@index([user_id], name: "idx_orders_user")
 }
 
-model CashMovement {
-  id             String       @id @default(uuid())
-  cashRegisterId String
-  cashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
+/// Items de orden (productos pedidos)
+model order_items {
+  id                 String            @id @default(uuid()) @db.Uuid
+  order_id           String            @db.Uuid
+  product_id         String            @db.Uuid
+  product_name       String            @db.VarChar(255)
+  product_short_name String?           @db.VarChar(50)
+  quantity           Int               @default(1)
+  unit_price         Decimal           @db.Decimal(10, 2)
+  variants_snapshot  Json?             @db.JsonB
+  variants_total     Decimal           @default(0) @db.Decimal(10, 2)
+  line_total         Decimal           @db.Decimal(10, 2)
+  status             order_item_status @default(PENDIENTE)
+  area_preparacion   area_preparacion
+  sent_to_kitchen_at DateTime?         @db.Timestamptz(6)
+  printed_at         DateTime?         @db.Timestamptz(6)
+  printer_id         String?           @db.Uuid
+  notes              String?           @db.Text
+  is_cancelled       Boolean           @default(false)
+  cancelled_at       DateTime?         @db.Timestamptz(6)
+  cancelled_by       String?           @db.Uuid
+  cancel_reason      String?           @db.Text
+  is_paid            Boolean           @default(false)
+  paid_at            DateTime?         @db.Timestamptz(6)
+  payment_id         String?           @db.Uuid
+  created_by         String            @db.Uuid
+  created_at         DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
 
-  amount      Decimal          @db.Decimal(10, 2)
-  type        CashMovementType
-  description String           @db.Text
-  isAutomatic Boolean          @default(false)
+  // Relaciones
+  order         orders          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product       products        @relation(fields: [product_id], references: [id])
+  printer       printers?       @relation(fields: [printer_id], references: [id])
+  creator       users           @relation("CreatedBy", fields: [created_by], references: [id])
+  canceller     users?          @relation("CancelledBy", fields: [cancelled_by], references: [id])
+  payment_items payment_items[]
+  sale_items    sale_items[]
 
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([cashRegisterId, type])
-  @@index([createdAt])
-  @@map("cash_movements")
+  @@index([order_id], name: "idx_order_items_order")
+  @@index([status, area_preparacion], name: "idx_order_items_status")
+  @@index([product_id], name: "idx_order_items_product")
 }
 
-// ============================================
-// UBIGEO PERÚ (CATÁLOGOS SUNAT)
-// ============================================
+/// Caja registradora
+model cash_registers {
+  id              String               @id @default(uuid()) @db.Uuid
+  user_id         String               @db.Uuid
+  open_time       DateTime             @default(now()) @db.Timestamptz(6)
+  close_time      DateTime?            @db.Timestamptz(6)
+  initial_amount  Decimal              @db.Decimal(12, 2)
+  total_sales     Decimal              @default(0) @db.Decimal(12, 2)
+  total_income    Decimal              @default(0) @db.Decimal(12, 2)
+  total_expense   Decimal              @default(0) @db.Decimal(12, 2)
+  expected_amount Decimal              @default(0) @db.Decimal(12, 2)
+  final_amount    Decimal?             @db.Decimal(12, 2)
+  difference      Decimal?             @db.Decimal(12, 2)
+  status          cash_register_status @default(ABIERTA)
+  notes           String?              @db.Text
+  created_at      DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
 
-model UbiRegion {
-  id     String @id @default(uuid())
-  codigo String @unique @db.VarChar(2)
-  nombre String @db.VarChar(100)
+  // Relaciones
+  user           users            @relation(fields: [user_id], references: [id])
+  cash_movements cash_movements[]
+  payments       payments[]
+  sales          sales[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  provincias UbiProvincia[]
-
-  @@index([nombre])
-  @@map("ubi_regiones")
+  @@index([status], name: "idx_cash_registers_status")
+  @@index([user_id], name: "idx_cash_registers_user")
 }
 
-model UbiProvincia {
-  id       String    @id @default(uuid())
-  regionId String
-  region   UbiRegion @relation(fields: [regionId], references: [id], onDelete: Cascade)
+/// Movimientos de caja
+model cash_movements {
+  id               String             @id @default(uuid()) @db.Uuid
+  cash_register_id String             @db.Uuid
+  type             cash_movement_type
+  amount           Decimal            @db.Decimal(12, 2)
+  description      String             @db.Text
+  is_automatic     Boolean            @default(false)
+  payment_id       String?            @db.Uuid
+  created_by       String             @db.Uuid
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
 
-  codigo String @unique @db.VarChar(4)
-  nombre String @db.VarChar(100)
+  // Relaciones
+  cash_register cash_registers @relation(fields: [cash_register_id], references: [id], onDelete: Cascade)
+  creator       users          @relation(fields: [created_by], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  distritos UbiDistrito[]
-
-  @@index([regionId])
-  @@index([nombre])
-  @@map("ubi_provincias")
+  @@index([cash_register_id], name: "idx_cash_movements_register")
 }
 
-model UbiDistrito {
-  id          String       @id @default(uuid())
-  provinciaId String
-  provincia   UbiProvincia @relation(fields: [provinciaId], references: [id], onDelete: Cascade)
+/// Pagos (completos o parciales)
+model payments {
+  id               String         @id @default(uuid()) @db.Uuid
+  order_id         String         @db.Uuid
+  cash_register_id String         @db.Uuid
+  payment_number   Int
+  amount           Decimal        @db.Decimal(12, 2)
+  payment_method   payment_method
+  amount_received  Decimal?       @db.Decimal(12, 2)
+  change_given     Decimal?       @db.Decimal(12, 2)
+  payer_name       String?        @db.VarChar(255)
+  payer_notes      String?        @db.Text
+  sale_id          String?        @db.Uuid
+  processed_by     String         @db.Uuid
+  created_at       DateTime       @default(now()) @db.Timestamptz(6)
 
-  codigo String @unique @db.VarChar(6) // Código UBIGEO completo
-  nombre String @db.VarChar(100)
+  // Relaciones
+  order         orders          @relation(fields: [order_id], references: [id])
+  cash_register cash_registers  @relation(fields: [cash_register_id], references: [id])
+  processor     users           @relation(fields: [processed_by], references: [id])
+  payment_items payment_items[]
+  sale          sales?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@index([order_id], name: "idx_payments_order")
+  @@index([cash_register_id], name: "idx_payments_cash_register")
+}
 
-  @@index([provinciaId])
-  @@index([nombre])
-  @@map("ubi_distritos")
+/// Items cubiertos por cada pago
+model payment_items {
+  id            String   @id @default(uuid()) @db.Uuid
+  payment_id    String   @db.Uuid
+  order_item_id String   @db.Uuid
+  quantity_paid Int
+  amount        Decimal  @db.Decimal(12, 2)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  payment    payments    @relation(fields: [payment_id], references: [id], onDelete: Cascade)
+  order_item order_items @relation(fields: [order_item_id], references: [id])
+
+  @@unique([payment_id, order_item_id])
+  @@index([payment_id], name: "idx_payment_items_payment")
+  @@index([order_item_id], name: "idx_payment_items_order_item")
+}
+
+/// Ventas / Comprobantes
+model sales {
+  id                 String           @id @default(uuid()) @db.Uuid
+  tipo_comprobante   comprobante_type
+  serie              String           @db.VarChar(4)
+  correlativo        Int
+  numero_completo    String           @unique @db.VarChar(15)
+  fecha_emision      DateTime         @default(now()) @db.Timestamptz(6)
+  fecha_vencimiento  DateTime?        @db.Timestamptz(6)
+  tipo_moneda        String           @default("PEN") @db.VarChar(3)
+  order_id           String?          @db.Uuid
+  payment_id         String?          @unique @db.Uuid
+  client_id          String?          @db.Uuid
+  user_id            String           @db.Uuid
+  cash_register_id   String?          @db.Uuid
+  payment_method     payment_method
+  forma_pago         String           @default("Contado") @db.VarChar(20)
+  monto_gravado      Decimal          @default(0) @db.Decimal(12, 2)
+  monto_exonerado    Decimal          @default(0) @db.Decimal(12, 2)
+  monto_inafecto     Decimal          @default(0) @db.Decimal(12, 2)
+  monto_gratuito     Decimal          @default(0) @db.Decimal(12, 2)
+  monto_igv          Decimal          @default(0) @db.Decimal(12, 2)
+  monto_icbper       Decimal          @default(0) @db.Decimal(12, 2)
+  total_impuestos    Decimal          @default(0) @db.Decimal(12, 2)
+  valor_venta        Decimal          @default(0) @db.Decimal(12, 2)
+  precio_venta_total Decimal          @db.Decimal(12, 2)
+  monto_pagado       Decimal?         @db.Decimal(12, 2)
+  vuelto             Decimal?         @db.Decimal(12, 2)
+  monto_letras       String?          @db.VarChar(500)
+  estado_sunat       estado_sunat     @default(NO_APLICA)
+  xml_path           String?          @db.VarChar(500)
+  pdf_path           String?          @db.VarChar(500)
+  cdr_path           String?          @db.VarChar(500)
+  sunat_hash         String?          @db.VarChar(100)
+  sunat_code         String?          @db.VarChar(10)
+  sunat_description  String?          @db.Text
+  created_at         DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  order            orders?            @relation(fields: [order_id], references: [id])
+  payment          payments?          @relation(fields: [payment_id], references: [id])
+  client           clients?           @relation(fields: [client_id], references: [id])
+  user             users              @relation(fields: [user_id], references: [id])
+  cash_register    cash_registers?    @relation(fields: [cash_register_id], references: [id])
+  sale_items       sale_items[]
+  credit_notes     credit_notes[]
+  voided_documents voided_documents[]
+
+  @@index([fecha_emision], name: "idx_sales_fecha")
+  @@index([numero_completo], name: "idx_sales_numero")
+  @@index([order_id], name: "idx_sales_order")
+  @@index([payment_id], name: "idx_sales_payment")
+  @@index([client_id], name: "idx_sales_client")
+}
+
+/// Items de venta (detalle del comprobante)
+model sale_items {
+  id                    String   @id @default(uuid()) @db.Uuid
+  sale_id               String   @db.Uuid
+  order_item_id         String?  @db.Uuid
+  product_id            String?  @db.Uuid
+  codigo_producto       String?  @db.VarChar(30)
+  descripcion           String   @db.VarChar(500)
+  unidad_medida         String   @db.VarChar(3)
+  cantidad              Decimal  @db.Decimal(12, 3)
+  mto_valor_unitario    Decimal  @db.Decimal(12, 10)
+  mto_precio_unitario   Decimal  @db.Decimal(12, 10)
+  mto_valor_venta       Decimal  @db.Decimal(12, 2)
+  afectacion_igv        String   @db.VarChar(2)
+  porcentaje_igv        Decimal  @default(18.00) @db.Decimal(5, 2)
+  mto_base_igv          Decimal  @default(0) @db.Decimal(12, 2)
+  mto_igv               Decimal  @default(0) @db.Decimal(12, 2)
+  mto_icbper            Decimal  @default(0) @db.Decimal(12, 2)
+  total_impuestos       Decimal  @default(0) @db.Decimal(12, 2)
+  variantes_descripcion String?  @db.Text
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  sale       sales        @relation(fields: [sale_id], references: [id], onDelete: Cascade)
+  order_item order_items? @relation(fields: [order_item_id], references: [id])
+  product    products?    @relation(fields: [product_id], references: [id])
+
+  @@index([sale_id], name: "idx_sale_items_sale")
+  @@index([product_id], name: "idx_sale_items_product")
+}
+
+/// Notas de crédito
+model credit_notes {
+  id              String            @id @default(uuid()) @db.Uuid
+  client_id       String            @db.Uuid
+  user_id         String            @db.Uuid
+  serie           String            @db.VarChar(4)
+  correlativo     String            @db.VarChar(8)
+  numero_completo String            @unique @db.VarChar(15)
+  fecha_emision   DateTime          @default(now()) @db.Timestamptz(6)
+  sale_id         String?           @db.Uuid
+  tipo_doc_ref    String            @db.VarChar(2)
+  serie_ref       String            @db.VarChar(4)
+  correlativo_ref String            @db.VarChar(8)
+  tipo_nota       tipo_nota_credito
+  motivo          String            @db.VarChar(500)
+  valor_venta     Decimal           @default(0) @db.Decimal(12, 2)
+  monto_igv       Decimal           @default(0) @db.Decimal(12, 2)
+  total_impuestos Decimal           @default(0) @db.Decimal(12, 2)
+  mto_imp_venta   Decimal           @db.Decimal(12, 2)
+  xml_path        String?           @db.VarChar(500)
+  pdf_path        String?           @db.VarChar(500)
+  cdr_path        String?           @db.VarChar(500)
+  estado_sunat    estado_sunat      @default(PENDIENTE)
+  sunat_hash      String?           @db.VarChar(100)
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  client            clients             @relation(fields: [client_id], references: [id])
+  user              users               @relation(fields: [user_id], references: [id])
+  sale              sales?              @relation(fields: [sale_id], references: [id])
+  credit_note_items credit_note_items[]
+
+  @@index([sale_id], name: "idx_credit_notes_sale")
+  @@index([fecha_emision], name: "idx_credit_notes_fecha")
+}
+
+/// Items de nota de crédito
+model credit_note_items {
+  id                  String   @id @default(uuid()) @db.Uuid
+  credit_note_id      String   @db.Uuid
+  product_id          String?  @db.Uuid
+  cantidad            Decimal  @db.Decimal(12, 3)
+  unidad_medida       String   @db.VarChar(3)
+  descripcion         String   @db.VarChar(500)
+  mto_valor_unitario  Decimal  @db.Decimal(12, 10)
+  mto_precio_unitario Decimal  @db.Decimal(12, 10)
+  mto_valor_venta     Decimal  @db.Decimal(12, 2)
+  afectacion_igv      String   @db.VarChar(2)
+  mto_igv             Decimal  @default(0) @db.Decimal(12, 2)
+  total_impuestos     Decimal  @default(0) @db.Decimal(12, 2)
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  credit_note credit_notes @relation(fields: [credit_note_id], references: [id], onDelete: Cascade)
+  product     products?    @relation(fields: [product_id], references: [id])
+}
+
+/// Resúmenes diarios de boletas
+model daily_summaries {
+  id               String       @id @default(uuid()) @db.Uuid
+  identificador    String       @unique @db.VarChar(20)
+  fecha_emision    DateTime     @default(now()) @db.Date
+  fecha_referencia DateTime     @db.Date
+  sales_ids        String[]     @db.Uuid
+  sales_count      Int
+  total_amount     Decimal      @db.Decimal(12, 2)
+  xml_path         String?      @db.VarChar(500)
+  cdr_path         String?      @db.VarChar(500)
+  estado_sunat     estado_sunat @default(PENDIENTE)
+  ticket_sunat     String?      @db.VarChar(50)
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+/// Documentos anulados (comunicación de baja)
+model voided_documents {
+  id               String       @id @default(uuid()) @db.Uuid
+  identificador    String       @unique @db.VarChar(20)
+  fecha_emision    DateTime     @default(now()) @db.Date
+  fecha_referencia DateTime     @db.Date
+  sale_id          String?      @db.Uuid
+  tipo_documento   String       @db.VarChar(2)
+  serie            String       @db.VarChar(4)
+  correlativo      String       @db.VarChar(8)
+  motivo           String       @db.VarChar(500)
+  xml_path         String?      @db.VarChar(500)
+  cdr_path         String?      @db.VarChar(500)
+  estado_sunat     estado_sunat @default(PENDIENTE)
+  ticket_sunat     String?      @db.VarChar(50)
+  created_at       DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  sale sales? @relation(fields: [sale_id], references: [id])
+}
+
+/// Reservaciones
+model reservations {
+  id               String   @id @default(uuid()) @db.Uuid
+  table_id         String   @db.Uuid
+  client_name      String   @db.VarChar(255)
+  client_phone     String?  @db.VarChar(20)
+  client_email     String?  @db.VarChar(100)
+  reservation_date DateTime @db.Date
+  reservation_time DateTime @db.Time(6)
+  duration_hours   Decimal  @default(2) @db.Decimal(3, 1)
+  diners_count     Int
+  notes            String?  @db.Text
+  status           String   @default("CONFIRMADA") @db.VarChar(20)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relaciones
+  table tables @relation(fields: [table_id], references: [id])
+
+  @@index([reservation_date, reservation_time], name: "idx_reservations_date")
+  @@index([table_id], name: "idx_reservations_table")
+}
+
+/// Historial de órdenes (para reportes)
+model order_history {
+  id                 String   @id @default(uuid()) @db.Uuid
+  order_id           String   @db.Uuid
+  order_daily_number Int
+  order_date         DateTime @db.Date
+  table_number       Int
+  floor_name         String   @db.VarChar(100)
+  waiter_name        String   @db.VarChar(255)
+  total_amount       Decimal  @db.Decimal(12, 2)
+  total_items        Int
+  was_split_payment  Boolean  @default(false)
+  payment_count      Int      @default(1)
+  sales_generated    Json?    @db.JsonB
+  opened_at          DateTime @db.Timestamptz(6)
+  closed_at          DateTime @db.Timestamptz(6)
+  duration_minutes   Int?
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  order orders @relation(fields: [order_id], references: [id])
+
+  @@index([order_date], name: "idx_order_history_date")
+  @@index([waiter_name], name: "idx_order_history_waiter")
+}
+
+/// Logs de auditoría
+model audit_logs {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String?  @db.Uuid
+  action      String   @db.VarChar(50)
+  entity_type String   @db.VarChar(50)
+  entity_id   String?  @db.Uuid
+  old_values  Json?    @db.JsonB
+  new_values  Json?    @db.JsonB
+  ip_address  String?  @db.VarChar(45)
+  user_agent  String?  @db.Text
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relaciones
+  user users? @relation(fields: [user_id], references: [id])
+
+  @@index([entity_type, entity_id], name: "idx_audit_logs_entity")
+  @@index([created_at(sort: Desc)], name: "idx_audit_logs_date")
+  @@index([user_id], name: "idx_audit_logs_user")
 }
