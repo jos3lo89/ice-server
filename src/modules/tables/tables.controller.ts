@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -19,6 +20,7 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('tables')
 export class TablesController {
   constructor(private readonly tablesService: TablesService) {}
+
   @Post()
   @Auth(Role.ADMIN)
   @ApiOperation({
@@ -32,7 +34,7 @@ export class TablesController {
   })
   async create(@Body() createTableDto: CreateTableDto) {
     const table = await this.tablesService.create(createTableDto);
-    return { success: true, data: table, message: 'Mesa creada' };
+    return { success: true, message: 'Mesa creada', data: table };
   }
 
   @Get()
@@ -41,10 +43,9 @@ export class TablesController {
     summary: 'Listar todas las mesas',
     description: 'Obtiene todas las mesas activas del sistema.',
   })
-  @ApiResponse({ status: 200, description: 'Lista completa obtenida.' })
-  async findAll() {
-    const tables = await this.tablesService.findAll();
-    return { success: true, data: tables };
+  @ApiResponse({ status: 200, description: 'Mesas obtenidas exitosamente.' })
+  findAll() {
+    return this.tablesService.findAll();
   }
 
   @Get('floor/:floorId')
@@ -55,9 +56,19 @@ export class TablesController {
       'Obtiene el mapa de mesas de un piso con su información de órdenes abiertas.',
   })
   @ApiParam({ name: 'floorId', description: 'ID del piso a consultar' })
-  async findByFloor(@Param('floorId', ParseUUIDPipe) floorId: string) {
-    const tables = await this.tablesService.findByFloor(floorId);
-    return { success: true, data: tables };
+  findByFloor(
+    @Param(
+      'floorId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de piso inválido');
+        },
+      }),
+    )
+    floorId: string,
+  ) {
+    return this.tablesService.findByFloor(floorId);
   }
 
   @Get('available')
@@ -67,8 +78,7 @@ export class TablesController {
     description: 'Lista únicamente las mesas con estado LIBRE.',
   })
   async findAvailable() {
-    const tables = await this.tablesService.findAvailable();
-    return { success: true, data: tables };
+    return await this.tablesService.findAvailable();
   }
 
   @Patch(':id/status')
@@ -77,20 +87,25 @@ export class TablesController {
     summary: 'Cambiar estado de mesa',
     description: 'Actualiza el estado (LIBRE, OCUPADA, RESERVADA, LIMPIEZA).',
   })
+  @ApiParam({ name: 'id', description: 'ID de la mesa a actualizar el estado' })
   @ApiResponse({
     status: 200,
     description: 'Estado actualizado correctamente.',
   })
-  async updateStatus(
-    @Param('id', ParseUUIDPipe) id: string,
+  updateStatus(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de mesa inválido');
+        },
+      }),
+    )
+    id: string,
     @Body() dto: UpdateTableStatusDto,
   ) {
-    const table = await this.tablesService.updateStatus(id, dto.status);
-    return {
-      success: true,
-      data: table,
-      message: `Mesa marcada como ${dto.status}`,
-    };
+    return this.tablesService.updateStatus(id, dto.status);
   }
 
   @Delete(':id')
@@ -99,8 +114,23 @@ export class TablesController {
     summary: 'Eliminar mesa',
     description: 'Desactiva la mesa de forma lógica.',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    await this.tablesService.softDelete(id);
-    return { success: true, message: 'Mesa desactivada correctamente' };
+  @ApiParam({ name: 'id', description: 'ID de la mesa a eliminar' })
+  @ApiResponse({
+    status: 200,
+    description: 'Mesa eliminada logicamente exitosamente.',
+  })
+  remove(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de mesa inválido');
+        },
+      }),
+    )
+    id: string,
+  ) {
+    return this.tablesService.softDelete(id);
   }
 }

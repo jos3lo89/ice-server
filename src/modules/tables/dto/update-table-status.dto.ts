@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { table_status } from 'src/generated/prisma/enums';
 
 export class UpdateTableStatusDto {
@@ -8,6 +8,10 @@ export class UpdateTableStatusDto {
     example: 'OCUPADA',
     description: 'Nuevo estado de la mesa',
   })
-  @IsEnum(table_status)
+  @IsNotEmpty({ message: 'El estado de la mesa es obligatorio.' })
+  @IsEnum(table_status, {
+    message:
+      'El estado seleccionado no es válido. Opciones permitidas: LIBRE, OCUPADA, RESERVADA, LIMPIEZA.',
+  })
   status: table_status;
 }
