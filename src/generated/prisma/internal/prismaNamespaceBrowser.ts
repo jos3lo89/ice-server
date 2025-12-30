@@ -154,6 +154,7 @@ export const UsersScalarFieldEnum = {
   dni: 'dni',
   username: 'username',
   password_hash: 'password_hash',
+  refreshToken: 'refreshToken',
   role: 'role',
   pin: 'pin',
   is_active: 'is_active',

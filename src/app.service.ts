@@ -12,16 +12,20 @@ export class AppService {
       return {
         app: 'Ice Mankora API',
         version: '1.0.0',
-        status: 'Operational',
-        database: 'Connected',
+        estado: 'Operacional',
+        base_datos: 'Conectada',
         timestamp: new Date().toISOString(),
-        message: 'Welcome to Ice Mankora Management System.',
+        mensaje: 'Bienvenido al sistema de gestión de Ice Mankora.',
+        detalles: 'Todos los servicios están funcionando correctamente.',
       };
     } catch (error) {
       throw new InternalServerErrorException({
-        status: 'Down',
-        database: 'Disconnected',
-        message: 'The API is running but the database is unreachable.',
+        estado: 'Inactivo',
+        base_datos: 'Desconectada',
+        mensaje:
+          'La API está en ejecución pero no puede acceder a la base de datos.',
+        recomendacion: 'Verifique la conexión a la base de datos.',
+        timestamp: new Date().toISOString(),
       });
     }
   }

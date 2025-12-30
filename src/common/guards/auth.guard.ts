@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromCookie(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token no proporcionado');
+      throw new UnauthorizedException('Acceso no autorizado');
     }
 
     try {
@@ -32,7 +32,7 @@ export class AuthGuard implements CanActivate {
       request['user'] = payload;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Token inválido');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
   }
 
