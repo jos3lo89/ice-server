@@ -573,14 +573,20 @@ export const ReservationsScalarFieldEnum = {
   client_name: 'client_name',
   client_phone: 'client_phone',
   client_email: 'client_email',
-  reservation_date: 'reservation_date',
-  reservation_time: 'reservation_time',
+  reservation_datetime: 'reservation_datetime',
+  end_datetime: 'end_datetime',
   duration_hours: 'duration_hours',
   diners_count: 'diners_count',
   notes: 'notes',
   status: 'status',
+  created_by: 'created_by',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  confirmed_by: 'confirmed_by',
+  confirmed_at: 'confirmed_at',
+  cancel_reason: 'cancel_reason',
+  cancelled_by: 'cancelled_by',
+  cancelled_at: 'cancelled_at'
 } as const
 
 export type ReservationsScalarFieldEnum = (typeof ReservationsScalarFieldEnum)[keyof typeof ReservationsScalarFieldEnum]

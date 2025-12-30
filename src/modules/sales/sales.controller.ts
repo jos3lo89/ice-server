@@ -25,7 +25,7 @@ import { SalesQueryDto } from './dto/sales-query.dto';
 import { VoidSaleDto } from './dto/void-sale.dto';
 import { type Response } from 'express';
 
-@ApiTags('Sales / Comprobantes')
+@ApiTags('Gestión de Comprobantes')
 @Controller('sales')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}

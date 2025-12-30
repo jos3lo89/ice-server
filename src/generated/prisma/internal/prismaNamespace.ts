@@ -2944,14 +2944,20 @@ export const ReservationsScalarFieldEnum = {
   client_name: 'client_name',
   client_phone: 'client_phone',
   client_email: 'client_email',
-  reservation_date: 'reservation_date',
-  reservation_time: 'reservation_time',
+  reservation_datetime: 'reservation_datetime',
+  end_datetime: 'end_datetime',
   duration_hours: 'duration_hours',
   diners_count: 'diners_count',
   notes: 'notes',
   status: 'status',
+  created_by: 'created_by',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  confirmed_by: 'confirmed_by',
+  confirmed_at: 'confirmed_at',
+  cancel_reason: 'cancel_reason',
+  cancelled_by: 'cancelled_by',
+  cancelled_at: 'cancelled_at'
 } as const
 
 export type ReservationsScalarFieldEnum = (typeof ReservationsScalarFieldEnum)[keyof typeof ReservationsScalarFieldEnum]
@@ -3284,6 +3290,20 @@ export type Enumtipo_nota_creditoFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'tipo_nota_credito[]'
  */
 export type ListEnumtipo_nota_creditoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'tipo_nota_credito[]'>
+    
+
+
+/**
+ * Reference to a field of type 'reservation_status'
+ */
+export type Enumreservation_statusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'reservation_status'>
+    
+
+
+/**
+ * Reference to a field of type 'reservation_status[]'
+ */
+export type ListEnumreservation_statusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'reservation_status[]'>
     
 
 

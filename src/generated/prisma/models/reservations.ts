@@ -14,7 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model reservations
- * Reservaciones
+ * 
  */
 export type reservationsModel = runtime.Types.Result.DefaultSelection<Prisma.$reservationsPayload>
 
@@ -27,12 +27,12 @@ export type AggregateReservations = {
 }
 
 export type ReservationsAvgAggregateOutputType = {
-  duration_hours: runtime.Decimal | null
+  duration_hours: number | null
   diners_count: number | null
 }
 
 export type ReservationsSumAggregateOutputType = {
-  duration_hours: runtime.Decimal | null
+  duration_hours: number | null
   diners_count: number | null
 }
 
@@ -42,14 +42,20 @@ export type ReservationsMinAggregateOutputType = {
   client_name: string | null
   client_phone: string | null
   client_email: string | null
-  reservation_date: Date | null
-  reservation_time: Date | null
-  duration_hours: runtime.Decimal | null
+  reservation_datetime: Date | null
+  end_datetime: Date | null
+  duration_hours: number | null
   diners_count: number | null
   notes: string | null
-  status: string | null
+  status: $Enums.reservation_status | null
+  created_by: string | null
   created_at: Date | null
   updated_at: Date | null
+  confirmed_by: string | null
+  confirmed_at: Date | null
+  cancel_reason: string | null
+  cancelled_by: string | null
+  cancelled_at: Date | null
 }
 
 export type ReservationsMaxAggregateOutputType = {
@@ -58,14 +64,20 @@ export type ReservationsMaxAggregateOutputType = {
   client_name: string | null
   client_phone: string | null
   client_email: string | null
-  reservation_date: Date | null
-  reservation_time: Date | null
-  duration_hours: runtime.Decimal | null
+  reservation_datetime: Date | null
+  end_datetime: Date | null
+  duration_hours: number | null
   diners_count: number | null
   notes: string | null
-  status: string | null
+  status: $Enums.reservation_status | null
+  created_by: string | null
   created_at: Date | null
   updated_at: Date | null
+  confirmed_by: string | null
+  confirmed_at: Date | null
+  cancel_reason: string | null
+  cancelled_by: string | null
+  cancelled_at: Date | null
 }
 
 export type ReservationsCountAggregateOutputType = {
@@ -74,14 +86,20 @@ export type ReservationsCountAggregateOutputType = {
   client_name: number
   client_phone: number
   client_email: number
-  reservation_date: number
-  reservation_time: number
+  reservation_datetime: number
+  end_datetime: number
   duration_hours: number
   diners_count: number
   notes: number
   status: number
+  created_by: number
   created_at: number
   updated_at: number
+  confirmed_by: number
+  confirmed_at: number
+  cancel_reason: number
+  cancelled_by: number
+  cancelled_at: number
   _all: number
 }
 
@@ -102,14 +120,20 @@ export type ReservationsMinAggregateInputType = {
   client_name?: true
   client_phone?: true
   client_email?: true
-  reservation_date?: true
-  reservation_time?: true
+  reservation_datetime?: true
+  end_datetime?: true
   duration_hours?: true
   diners_count?: true
   notes?: true
   status?: true
+  created_by?: true
   created_at?: true
   updated_at?: true
+  confirmed_by?: true
+  confirmed_at?: true
+  cancel_reason?: true
+  cancelled_by?: true
+  cancelled_at?: true
 }
 
 export type ReservationsMaxAggregateInputType = {
@@ -118,14 +142,20 @@ export type ReservationsMaxAggregateInputType = {
   client_name?: true
   client_phone?: true
   client_email?: true
-  reservation_date?: true
-  reservation_time?: true
+  reservation_datetime?: true
+  end_datetime?: true
   duration_hours?: true
   diners_count?: true
   notes?: true
   status?: true
+  created_by?: true
   created_at?: true
   updated_at?: true
+  confirmed_by?: true
+  confirmed_at?: true
+  cancel_reason?: true
+  cancelled_by?: true
+  cancelled_at?: true
 }
 
 export type ReservationsCountAggregateInputType = {
@@ -134,14 +164,20 @@ export type ReservationsCountAggregateInputType = {
   client_name?: true
   client_phone?: true
   client_email?: true
-  reservation_date?: true
-  reservation_time?: true
+  reservation_datetime?: true
+  end_datetime?: true
   duration_hours?: true
   diners_count?: true
   notes?: true
   status?: true
+  created_by?: true
   created_at?: true
   updated_at?: true
+  confirmed_by?: true
+  confirmed_at?: true
+  cancel_reason?: true
+  cancelled_by?: true
+  cancelled_at?: true
   _all?: true
 }
 
@@ -235,16 +271,22 @@ export type ReservationsGroupByOutputType = {
   id: string
   table_id: string
   client_name: string
-  client_phone: string | null
+  client_phone: string
   client_email: string | null
-  reservation_date: Date
-  reservation_time: Date
-  duration_hours: runtime.Decimal
+  reservation_datetime: Date
+  end_datetime: Date
+  duration_hours: number
   diners_count: number
   notes: string | null
-  status: string
+  status: $Enums.reservation_status
+  created_by: string
   created_at: Date
   updated_at: Date
+  confirmed_by: string | null
+  confirmed_at: Date | null
+  cancel_reason: string | null
+  cancelled_by: string | null
+  cancelled_at: Date | null
   _count: ReservationsCountAggregateOutputType | null
   _avg: ReservationsAvgAggregateOutputType | null
   _sum: ReservationsSumAggregateOutputType | null
@@ -274,34 +316,52 @@ export type reservationsWhereInput = {
   id?: Prisma.UuidFilter<"reservations"> | string
   table_id?: Prisma.UuidFilter<"reservations"> | string
   client_name?: Prisma.StringFilter<"reservations"> | string
-  client_phone?: Prisma.StringNullableFilter<"reservations"> | string | null
+  client_phone?: Prisma.StringFilter<"reservations"> | string
   client_email?: Prisma.StringNullableFilter<"reservations"> | string | null
-  reservation_date?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  reservation_time?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  duration_hours?: Prisma.DecimalFilter<"reservations"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  end_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  duration_hours?: Prisma.IntFilter<"reservations"> | number
   diners_count?: Prisma.IntFilter<"reservations"> | number
   notes?: Prisma.StringNullableFilter<"reservations"> | string | null
-  status?: Prisma.StringFilter<"reservations"> | string
+  status?: Prisma.Enumreservation_statusFilter<"reservations"> | $Enums.reservation_status
+  created_by?: Prisma.UuidFilter<"reservations"> | string
   created_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  confirmed_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  confirmed_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
+  cancel_reason?: Prisma.StringNullableFilter<"reservations"> | string | null
+  cancelled_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  cancelled_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
   table?: Prisma.XOR<Prisma.TablesScalarRelationFilter, Prisma.tablesWhereInput>
+  creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
+  confirmer?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  canceller?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }
 
 export type reservationsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   table_id?: Prisma.SortOrder
   client_name?: Prisma.SortOrder
-  client_phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  client_phone?: Prisma.SortOrder
   client_email?: Prisma.SortOrderInput | Prisma.SortOrder
-  reservation_date?: Prisma.SortOrder
-  reservation_time?: Prisma.SortOrder
+  reservation_datetime?: Prisma.SortOrder
+  end_datetime?: Prisma.SortOrder
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  confirmed_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancel_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelled_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelled_at?: Prisma.SortOrderInput | Prisma.SortOrder
   table?: Prisma.tablesOrderByWithRelationInput
+  creator?: Prisma.usersOrderByWithRelationInput
+  confirmer?: Prisma.usersOrderByWithRelationInput
+  canceller?: Prisma.usersOrderByWithRelationInput
 }
 
 export type reservationsWhereUniqueInput = Prisma.AtLeast<{
@@ -311,33 +371,48 @@ export type reservationsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.reservationsWhereInput | Prisma.reservationsWhereInput[]
   table_id?: Prisma.UuidFilter<"reservations"> | string
   client_name?: Prisma.StringFilter<"reservations"> | string
-  client_phone?: Prisma.StringNullableFilter<"reservations"> | string | null
+  client_phone?: Prisma.StringFilter<"reservations"> | string
   client_email?: Prisma.StringNullableFilter<"reservations"> | string | null
-  reservation_date?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  reservation_time?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  duration_hours?: Prisma.DecimalFilter<"reservations"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  end_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  duration_hours?: Prisma.IntFilter<"reservations"> | number
   diners_count?: Prisma.IntFilter<"reservations"> | number
   notes?: Prisma.StringNullableFilter<"reservations"> | string | null
-  status?: Prisma.StringFilter<"reservations"> | string
+  status?: Prisma.Enumreservation_statusFilter<"reservations"> | $Enums.reservation_status
+  created_by?: Prisma.UuidFilter<"reservations"> | string
   created_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  confirmed_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  confirmed_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
+  cancel_reason?: Prisma.StringNullableFilter<"reservations"> | string | null
+  cancelled_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  cancelled_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
   table?: Prisma.XOR<Prisma.TablesScalarRelationFilter, Prisma.tablesWhereInput>
+  creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
+  confirmer?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  canceller?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
 }, "id">
 
 export type reservationsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   table_id?: Prisma.SortOrder
   client_name?: Prisma.SortOrder
-  client_phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  client_phone?: Prisma.SortOrder
   client_email?: Prisma.SortOrderInput | Prisma.SortOrder
-  reservation_date?: Prisma.SortOrder
-  reservation_time?: Prisma.SortOrder
+  reservation_datetime?: Prisma.SortOrder
+  end_datetime?: Prisma.SortOrder
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  confirmed_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancel_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelled_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelled_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.reservationsCountOrderByAggregateInput
   _avg?: Prisma.reservationsAvgOrderByAggregateInput
   _max?: Prisma.reservationsMaxOrderByAggregateInput
@@ -352,127 +427,172 @@ export type reservationsScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"reservations"> | string
   table_id?: Prisma.UuidWithAggregatesFilter<"reservations"> | string
   client_name?: Prisma.StringWithAggregatesFilter<"reservations"> | string
-  client_phone?: Prisma.StringNullableWithAggregatesFilter<"reservations"> | string | null
+  client_phone?: Prisma.StringWithAggregatesFilter<"reservations"> | string
   client_email?: Prisma.StringNullableWithAggregatesFilter<"reservations"> | string | null
-  reservation_date?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
-  reservation_time?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
-  duration_hours?: Prisma.DecimalWithAggregatesFilter<"reservations"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
+  end_datetime?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
+  duration_hours?: Prisma.IntWithAggregatesFilter<"reservations"> | number
   diners_count?: Prisma.IntWithAggregatesFilter<"reservations"> | number
   notes?: Prisma.StringNullableWithAggregatesFilter<"reservations"> | string | null
-  status?: Prisma.StringWithAggregatesFilter<"reservations"> | string
+  status?: Prisma.Enumreservation_statusWithAggregatesFilter<"reservations"> | $Enums.reservation_status
+  created_by?: Prisma.UuidWithAggregatesFilter<"reservations"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"reservations"> | Date | string
+  confirmed_by?: Prisma.UuidNullableWithAggregatesFilter<"reservations"> | string | null
+  confirmed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"reservations"> | Date | string | null
+  cancel_reason?: Prisma.StringNullableWithAggregatesFilter<"reservations"> | string | null
+  cancelled_by?: Prisma.UuidNullableWithAggregatesFilter<"reservations"> | string | null
+  cancelled_at?: Prisma.DateTimeNullableWithAggregatesFilter<"reservations"> | Date | string | null
 }
 
 export type reservationsCreateInput = {
   id?: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
   table: Prisma.tablesCreateNestedOneWithoutReservationsInput
+  creator: Prisma.usersCreateNestedOneWithoutReservations_createdInput
+  confirmer?: Prisma.usersCreateNestedOneWithoutReservations_confirmedInput
+  canceller?: Prisma.usersCreateNestedOneWithoutReservations_cancelledInput
 }
 
 export type reservationsUncheckedCreateInput = {
   id?: string
   table_id: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
+  created_by: string
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
 }
 
 export type reservationsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   table?: Prisma.tablesUpdateOneRequiredWithoutReservationsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutReservations_createdNestedInput
+  confirmer?: Prisma.usersUpdateOneWithoutReservations_confirmedNestedInput
+  canceller?: Prisma.usersUpdateOneWithoutReservations_cancelledNestedInput
 }
 
 export type reservationsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   table_id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type reservationsCreateManyInput = {
   id?: string
   table_id: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
+  created_by: string
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
 }
 
 export type reservationsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type reservationsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   table_id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ReservationsListRelationFilter = {
@@ -491,14 +611,20 @@ export type reservationsCountOrderByAggregateInput = {
   client_name?: Prisma.SortOrder
   client_phone?: Prisma.SortOrder
   client_email?: Prisma.SortOrder
-  reservation_date?: Prisma.SortOrder
-  reservation_time?: Prisma.SortOrder
+  reservation_datetime?: Prisma.SortOrder
+  end_datetime?: Prisma.SortOrder
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  confirmed_by?: Prisma.SortOrder
+  confirmed_at?: Prisma.SortOrder
+  cancel_reason?: Prisma.SortOrder
+  cancelled_by?: Prisma.SortOrder
+  cancelled_at?: Prisma.SortOrder
 }
 
 export type reservationsAvgOrderByAggregateInput = {
@@ -512,14 +638,20 @@ export type reservationsMaxOrderByAggregateInput = {
   client_name?: Prisma.SortOrder
   client_phone?: Prisma.SortOrder
   client_email?: Prisma.SortOrder
-  reservation_date?: Prisma.SortOrder
-  reservation_time?: Prisma.SortOrder
+  reservation_datetime?: Prisma.SortOrder
+  end_datetime?: Prisma.SortOrder
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  confirmed_by?: Prisma.SortOrder
+  confirmed_at?: Prisma.SortOrder
+  cancel_reason?: Prisma.SortOrder
+  cancelled_by?: Prisma.SortOrder
+  cancelled_at?: Prisma.SortOrder
 }
 
 export type reservationsMinOrderByAggregateInput = {
@@ -528,19 +660,151 @@ export type reservationsMinOrderByAggregateInput = {
   client_name?: Prisma.SortOrder
   client_phone?: Prisma.SortOrder
   client_email?: Prisma.SortOrder
-  reservation_date?: Prisma.SortOrder
-  reservation_time?: Prisma.SortOrder
+  reservation_datetime?: Prisma.SortOrder
+  end_datetime?: Prisma.SortOrder
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  confirmed_by?: Prisma.SortOrder
+  confirmed_at?: Prisma.SortOrder
+  cancel_reason?: Prisma.SortOrder
+  cancelled_by?: Prisma.SortOrder
+  cancelled_at?: Prisma.SortOrder
 }
 
 export type reservationsSumOrderByAggregateInput = {
   duration_hours?: Prisma.SortOrder
   diners_count?: Prisma.SortOrder
+}
+
+export type reservationsCreateNestedManyWithoutCreatorInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput> | Prisma.reservationsCreateWithoutCreatorInput[] | Prisma.reservationsUncheckedCreateWithoutCreatorInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCreatorInput | Prisma.reservationsCreateOrConnectWithoutCreatorInput[]
+  createMany?: Prisma.reservationsCreateManyCreatorInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsCreateNestedManyWithoutConfirmerInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput> | Prisma.reservationsCreateWithoutConfirmerInput[] | Prisma.reservationsUncheckedCreateWithoutConfirmerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutConfirmerInput | Prisma.reservationsCreateOrConnectWithoutConfirmerInput[]
+  createMany?: Prisma.reservationsCreateManyConfirmerInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsCreateNestedManyWithoutCancellerInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput> | Prisma.reservationsCreateWithoutCancellerInput[] | Prisma.reservationsUncheckedCreateWithoutCancellerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCancellerInput | Prisma.reservationsCreateOrConnectWithoutCancellerInput[]
+  createMany?: Prisma.reservationsCreateManyCancellerInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsUncheckedCreateNestedManyWithoutCreatorInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput> | Prisma.reservationsCreateWithoutCreatorInput[] | Prisma.reservationsUncheckedCreateWithoutCreatorInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCreatorInput | Prisma.reservationsCreateOrConnectWithoutCreatorInput[]
+  createMany?: Prisma.reservationsCreateManyCreatorInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsUncheckedCreateNestedManyWithoutConfirmerInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput> | Prisma.reservationsCreateWithoutConfirmerInput[] | Prisma.reservationsUncheckedCreateWithoutConfirmerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutConfirmerInput | Prisma.reservationsCreateOrConnectWithoutConfirmerInput[]
+  createMany?: Prisma.reservationsCreateManyConfirmerInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsUncheckedCreateNestedManyWithoutCancellerInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput> | Prisma.reservationsCreateWithoutCancellerInput[] | Prisma.reservationsUncheckedCreateWithoutCancellerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCancellerInput | Prisma.reservationsCreateOrConnectWithoutCancellerInput[]
+  createMany?: Prisma.reservationsCreateManyCancellerInputEnvelope
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+}
+
+export type reservationsUpdateManyWithoutCreatorNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput> | Prisma.reservationsCreateWithoutCreatorInput[] | Prisma.reservationsUncheckedCreateWithoutCreatorInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCreatorInput | Prisma.reservationsCreateOrConnectWithoutCreatorInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutCreatorInput | Prisma.reservationsUpsertWithWhereUniqueWithoutCreatorInput[]
+  createMany?: Prisma.reservationsCreateManyCreatorInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutCreatorInput | Prisma.reservationsUpdateWithWhereUniqueWithoutCreatorInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutCreatorInput | Prisma.reservationsUpdateManyWithWhereWithoutCreatorInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+}
+
+export type reservationsUpdateManyWithoutConfirmerNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput> | Prisma.reservationsCreateWithoutConfirmerInput[] | Prisma.reservationsUncheckedCreateWithoutConfirmerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutConfirmerInput | Prisma.reservationsCreateOrConnectWithoutConfirmerInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutConfirmerInput | Prisma.reservationsUpsertWithWhereUniqueWithoutConfirmerInput[]
+  createMany?: Prisma.reservationsCreateManyConfirmerInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutConfirmerInput | Prisma.reservationsUpdateWithWhereUniqueWithoutConfirmerInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutConfirmerInput | Prisma.reservationsUpdateManyWithWhereWithoutConfirmerInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+}
+
+export type reservationsUpdateManyWithoutCancellerNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput> | Prisma.reservationsCreateWithoutCancellerInput[] | Prisma.reservationsUncheckedCreateWithoutCancellerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCancellerInput | Prisma.reservationsCreateOrConnectWithoutCancellerInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutCancellerInput | Prisma.reservationsUpsertWithWhereUniqueWithoutCancellerInput[]
+  createMany?: Prisma.reservationsCreateManyCancellerInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutCancellerInput | Prisma.reservationsUpdateWithWhereUniqueWithoutCancellerInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutCancellerInput | Prisma.reservationsUpdateManyWithWhereWithoutCancellerInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+}
+
+export type reservationsUncheckedUpdateManyWithoutCreatorNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput> | Prisma.reservationsCreateWithoutCreatorInput[] | Prisma.reservationsUncheckedCreateWithoutCreatorInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCreatorInput | Prisma.reservationsCreateOrConnectWithoutCreatorInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutCreatorInput | Prisma.reservationsUpsertWithWhereUniqueWithoutCreatorInput[]
+  createMany?: Prisma.reservationsCreateManyCreatorInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutCreatorInput | Prisma.reservationsUpdateWithWhereUniqueWithoutCreatorInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutCreatorInput | Prisma.reservationsUpdateManyWithWhereWithoutCreatorInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+}
+
+export type reservationsUncheckedUpdateManyWithoutConfirmerNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput> | Prisma.reservationsCreateWithoutConfirmerInput[] | Prisma.reservationsUncheckedCreateWithoutConfirmerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutConfirmerInput | Prisma.reservationsCreateOrConnectWithoutConfirmerInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutConfirmerInput | Prisma.reservationsUpsertWithWhereUniqueWithoutConfirmerInput[]
+  createMany?: Prisma.reservationsCreateManyConfirmerInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutConfirmerInput | Prisma.reservationsUpdateWithWhereUniqueWithoutConfirmerInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutConfirmerInput | Prisma.reservationsUpdateManyWithWhereWithoutConfirmerInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+}
+
+export type reservationsUncheckedUpdateManyWithoutCancellerNestedInput = {
+  create?: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput> | Prisma.reservationsCreateWithoutCancellerInput[] | Prisma.reservationsUncheckedCreateWithoutCancellerInput[]
+  connectOrCreate?: Prisma.reservationsCreateOrConnectWithoutCancellerInput | Prisma.reservationsCreateOrConnectWithoutCancellerInput[]
+  upsert?: Prisma.reservationsUpsertWithWhereUniqueWithoutCancellerInput | Prisma.reservationsUpsertWithWhereUniqueWithoutCancellerInput[]
+  createMany?: Prisma.reservationsCreateManyCancellerInputEnvelope
+  set?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  disconnect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  delete?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  connect?: Prisma.reservationsWhereUniqueInput | Prisma.reservationsWhereUniqueInput[]
+  update?: Prisma.reservationsUpdateWithWhereUniqueWithoutCancellerInput | Prisma.reservationsUpdateWithWhereUniqueWithoutCancellerInput[]
+  updateMany?: Prisma.reservationsUpdateManyWithWhereWithoutCancellerInput | Prisma.reservationsUpdateManyWithWhereWithoutCancellerInput[]
+  deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
 }
 
 export type reservationsCreateNestedManyWithoutTableInput = {
@@ -585,34 +849,279 @@ export type reservationsUncheckedUpdateManyWithoutTableNestedInput = {
   deleteMany?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
 }
 
+export type Enumreservation_statusFieldUpdateOperationsInput = {
+  set?: $Enums.reservation_status
+}
+
+export type reservationsCreateWithoutCreatorInput = {
+  id?: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+  table: Prisma.tablesCreateNestedOneWithoutReservationsInput
+  confirmer?: Prisma.usersCreateNestedOneWithoutReservations_confirmedInput
+  canceller?: Prisma.usersCreateNestedOneWithoutReservations_cancelledInput
+}
+
+export type reservationsUncheckedCreateWithoutCreatorInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsCreateOrConnectWithoutCreatorInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput>
+}
+
+export type reservationsCreateManyCreatorInputEnvelope = {
+  data: Prisma.reservationsCreateManyCreatorInput | Prisma.reservationsCreateManyCreatorInput[]
+  skipDuplicates?: boolean
+}
+
+export type reservationsCreateWithoutConfirmerInput = {
+  id?: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+  table: Prisma.tablesCreateNestedOneWithoutReservationsInput
+  creator: Prisma.usersCreateNestedOneWithoutReservations_createdInput
+  canceller?: Prisma.usersCreateNestedOneWithoutReservations_cancelledInput
+}
+
+export type reservationsUncheckedCreateWithoutConfirmerInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_by: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsCreateOrConnectWithoutConfirmerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput>
+}
+
+export type reservationsCreateManyConfirmerInputEnvelope = {
+  data: Prisma.reservationsCreateManyConfirmerInput | Prisma.reservationsCreateManyConfirmerInput[]
+  skipDuplicates?: boolean
+}
+
+export type reservationsCreateWithoutCancellerInput = {
+  id?: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+  table: Prisma.tablesCreateNestedOneWithoutReservationsInput
+  creator: Prisma.usersCreateNestedOneWithoutReservations_createdInput
+  confirmer?: Prisma.usersCreateNestedOneWithoutReservations_confirmedInput
+}
+
+export type reservationsUncheckedCreateWithoutCancellerInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_by: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsCreateOrConnectWithoutCancellerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput>
+}
+
+export type reservationsCreateManyCancellerInputEnvelope = {
+  data: Prisma.reservationsCreateManyCancellerInput | Prisma.reservationsCreateManyCancellerInput[]
+  skipDuplicates?: boolean
+}
+
+export type reservationsUpsertWithWhereUniqueWithoutCreatorInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  update: Prisma.XOR<Prisma.reservationsUpdateWithoutCreatorInput, Prisma.reservationsUncheckedUpdateWithoutCreatorInput>
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutCreatorInput, Prisma.reservationsUncheckedCreateWithoutCreatorInput>
+}
+
+export type reservationsUpdateWithWhereUniqueWithoutCreatorInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  data: Prisma.XOR<Prisma.reservationsUpdateWithoutCreatorInput, Prisma.reservationsUncheckedUpdateWithoutCreatorInput>
+}
+
+export type reservationsUpdateManyWithWhereWithoutCreatorInput = {
+  where: Prisma.reservationsScalarWhereInput
+  data: Prisma.XOR<Prisma.reservationsUpdateManyMutationInput, Prisma.reservationsUncheckedUpdateManyWithoutCreatorInput>
+}
+
+export type reservationsScalarWhereInput = {
+  AND?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+  OR?: Prisma.reservationsScalarWhereInput[]
+  NOT?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
+  id?: Prisma.UuidFilter<"reservations"> | string
+  table_id?: Prisma.UuidFilter<"reservations"> | string
+  client_name?: Prisma.StringFilter<"reservations"> | string
+  client_phone?: Prisma.StringFilter<"reservations"> | string
+  client_email?: Prisma.StringNullableFilter<"reservations"> | string | null
+  reservation_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  end_datetime?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  duration_hours?: Prisma.IntFilter<"reservations"> | number
+  diners_count?: Prisma.IntFilter<"reservations"> | number
+  notes?: Prisma.StringNullableFilter<"reservations"> | string | null
+  status?: Prisma.Enumreservation_statusFilter<"reservations"> | $Enums.reservation_status
+  created_by?: Prisma.UuidFilter<"reservations"> | string
+  created_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  updated_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
+  confirmed_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  confirmed_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
+  cancel_reason?: Prisma.StringNullableFilter<"reservations"> | string | null
+  cancelled_by?: Prisma.UuidNullableFilter<"reservations"> | string | null
+  cancelled_at?: Prisma.DateTimeNullableFilter<"reservations"> | Date | string | null
+}
+
+export type reservationsUpsertWithWhereUniqueWithoutConfirmerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  update: Prisma.XOR<Prisma.reservationsUpdateWithoutConfirmerInput, Prisma.reservationsUncheckedUpdateWithoutConfirmerInput>
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutConfirmerInput, Prisma.reservationsUncheckedCreateWithoutConfirmerInput>
+}
+
+export type reservationsUpdateWithWhereUniqueWithoutConfirmerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  data: Prisma.XOR<Prisma.reservationsUpdateWithoutConfirmerInput, Prisma.reservationsUncheckedUpdateWithoutConfirmerInput>
+}
+
+export type reservationsUpdateManyWithWhereWithoutConfirmerInput = {
+  where: Prisma.reservationsScalarWhereInput
+  data: Prisma.XOR<Prisma.reservationsUpdateManyMutationInput, Prisma.reservationsUncheckedUpdateManyWithoutConfirmerInput>
+}
+
+export type reservationsUpsertWithWhereUniqueWithoutCancellerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  update: Prisma.XOR<Prisma.reservationsUpdateWithoutCancellerInput, Prisma.reservationsUncheckedUpdateWithoutCancellerInput>
+  create: Prisma.XOR<Prisma.reservationsCreateWithoutCancellerInput, Prisma.reservationsUncheckedCreateWithoutCancellerInput>
+}
+
+export type reservationsUpdateWithWhereUniqueWithoutCancellerInput = {
+  where: Prisma.reservationsWhereUniqueInput
+  data: Prisma.XOR<Prisma.reservationsUpdateWithoutCancellerInput, Prisma.reservationsUncheckedUpdateWithoutCancellerInput>
+}
+
+export type reservationsUpdateManyWithWhereWithoutCancellerInput = {
+  where: Prisma.reservationsScalarWhereInput
+  data: Prisma.XOR<Prisma.reservationsUpdateManyMutationInput, Prisma.reservationsUncheckedUpdateManyWithoutCancellerInput>
+}
+
 export type reservationsCreateWithoutTableInput = {
   id?: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+  creator: Prisma.usersCreateNestedOneWithoutReservations_createdInput
+  confirmer?: Prisma.usersCreateNestedOneWithoutReservations_confirmedInput
+  canceller?: Prisma.usersCreateNestedOneWithoutReservations_cancelledInput
 }
 
 export type reservationsUncheckedCreateWithoutTableInput = {
   id?: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
+  created_by: string
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
 }
 
 export type reservationsCreateOrConnectWithoutTableInput = {
@@ -641,83 +1150,340 @@ export type reservationsUpdateManyWithWhereWithoutTableInput = {
   data: Prisma.XOR<Prisma.reservationsUpdateManyMutationInput, Prisma.reservationsUncheckedUpdateManyWithoutTableInput>
 }
 
-export type reservationsScalarWhereInput = {
-  AND?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
-  OR?: Prisma.reservationsScalarWhereInput[]
-  NOT?: Prisma.reservationsScalarWhereInput | Prisma.reservationsScalarWhereInput[]
-  id?: Prisma.UuidFilter<"reservations"> | string
-  table_id?: Prisma.UuidFilter<"reservations"> | string
-  client_name?: Prisma.StringFilter<"reservations"> | string
-  client_phone?: Prisma.StringNullableFilter<"reservations"> | string | null
-  client_email?: Prisma.StringNullableFilter<"reservations"> | string | null
-  reservation_date?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  reservation_time?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  duration_hours?: Prisma.DecimalFilter<"reservations"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  diners_count?: Prisma.IntFilter<"reservations"> | number
-  notes?: Prisma.StringNullableFilter<"reservations"> | string | null
-  status?: Prisma.StringFilter<"reservations"> | string
-  created_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
-  updated_at?: Prisma.DateTimeFilter<"reservations"> | Date | string
+export type reservationsCreateManyCreatorInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsCreateManyConfirmerInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_by: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsCreateManyCancellerInput = {
+  id?: string
+  table_id: string
+  client_name: string
+  client_phone: string
+  client_email?: string | null
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
+  diners_count: number
+  notes?: string | null
+  status?: $Enums.reservation_status
+  created_by: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_at?: Date | string | null
+}
+
+export type reservationsUpdateWithoutCreatorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  table?: Prisma.tablesUpdateOneRequiredWithoutReservationsNestedInput
+  confirmer?: Prisma.usersUpdateOneWithoutReservations_confirmedNestedInput
+  canceller?: Prisma.usersUpdateOneWithoutReservations_cancelledNestedInput
+}
+
+export type reservationsUncheckedUpdateWithoutCreatorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type reservationsUncheckedUpdateManyWithoutCreatorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type reservationsUpdateWithoutConfirmerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  table?: Prisma.tablesUpdateOneRequiredWithoutReservationsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutReservations_createdNestedInput
+  canceller?: Prisma.usersUpdateOneWithoutReservations_cancelledNestedInput
+}
+
+export type reservationsUncheckedUpdateWithoutConfirmerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type reservationsUncheckedUpdateManyWithoutConfirmerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type reservationsUpdateWithoutCancellerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  table?: Prisma.tablesUpdateOneRequiredWithoutReservationsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutReservations_createdNestedInput
+  confirmer?: Prisma.usersUpdateOneWithoutReservations_confirmedNestedInput
+}
+
+export type reservationsUncheckedUpdateWithoutCancellerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type reservationsUncheckedUpdateManyWithoutCancellerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  table_id?: Prisma.StringFieldUpdateOperationsInput | string
+  client_name?: Prisma.StringFieldUpdateOperationsInput | string
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
+  client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
+  diners_count?: Prisma.IntFieldUpdateOperationsInput | number
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type reservationsCreateManyTableInput = {
   id?: string
   client_name: string
-  client_phone?: string | null
+  client_phone: string
   client_email?: string | null
-  reservation_date: Date | string
-  reservation_time: Date | string
-  duration_hours?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime: Date | string
+  end_datetime: Date | string
+  duration_hours?: number
   diners_count: number
   notes?: string | null
-  status?: string
+  status?: $Enums.reservation_status
+  created_by: string
   created_at?: Date | string
   updated_at?: Date | string
+  confirmed_by?: string | null
+  confirmed_at?: Date | string | null
+  cancel_reason?: string | null
+  cancelled_by?: string | null
+  cancelled_at?: Date | string | null
 }
 
 export type reservationsUpdateWithoutTableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  creator?: Prisma.usersUpdateOneRequiredWithoutReservations_createdNestedInput
+  confirmer?: Prisma.usersUpdateOneWithoutReservations_confirmedNestedInput
+  canceller?: Prisma.usersUpdateOneWithoutReservations_cancelledNestedInput
 }
 
 export type reservationsUncheckedUpdateWithoutTableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type reservationsUncheckedUpdateManyWithoutTableInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   client_name?: Prisma.StringFieldUpdateOperationsInput | string
-  client_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  client_phone?: Prisma.StringFieldUpdateOperationsInput | string
   client_email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  reservation_date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  reservation_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  duration_hours?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reservation_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  end_datetime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  duration_hours?: Prisma.IntFieldUpdateOperationsInput | number
   diners_count?: Prisma.IntFieldUpdateOperationsInput | number
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enumreservation_statusFieldUpdateOperationsInput | $Enums.reservation_status
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmed_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -728,15 +1494,24 @@ export type reservationsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   client_name?: boolean
   client_phone?: boolean
   client_email?: boolean
-  reservation_date?: boolean
-  reservation_time?: boolean
+  reservation_datetime?: boolean
+  end_datetime?: boolean
   duration_hours?: boolean
   diners_count?: boolean
   notes?: boolean
   status?: boolean
+  created_by?: boolean
   created_at?: boolean
   updated_at?: boolean
+  confirmed_by?: boolean
+  confirmed_at?: boolean
+  cancel_reason?: boolean
+  cancelled_by?: boolean
+  cancelled_at?: boolean
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }, ExtArgs["result"]["reservations"]>
 
 export type reservationsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -745,15 +1520,24 @@ export type reservationsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   client_name?: boolean
   client_phone?: boolean
   client_email?: boolean
-  reservation_date?: boolean
-  reservation_time?: boolean
+  reservation_datetime?: boolean
+  end_datetime?: boolean
   duration_hours?: boolean
   diners_count?: boolean
   notes?: boolean
   status?: boolean
+  created_by?: boolean
   created_at?: boolean
   updated_at?: boolean
+  confirmed_by?: boolean
+  confirmed_at?: boolean
+  cancel_reason?: boolean
+  cancelled_by?: boolean
+  cancelled_at?: boolean
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }, ExtArgs["result"]["reservations"]>
 
 export type reservationsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -762,15 +1546,24 @@ export type reservationsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   client_name?: boolean
   client_phone?: boolean
   client_email?: boolean
-  reservation_date?: boolean
-  reservation_time?: boolean
+  reservation_datetime?: boolean
+  end_datetime?: boolean
   duration_hours?: boolean
   diners_count?: boolean
   notes?: boolean
   status?: boolean
+  created_by?: boolean
   created_at?: boolean
   updated_at?: boolean
+  confirmed_by?: boolean
+  confirmed_at?: boolean
+  cancel_reason?: boolean
+  cancelled_by?: boolean
+  cancelled_at?: boolean
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }, ExtArgs["result"]["reservations"]>
 
 export type reservationsSelectScalar = {
@@ -779,46 +1572,70 @@ export type reservationsSelectScalar = {
   client_name?: boolean
   client_phone?: boolean
   client_email?: boolean
-  reservation_date?: boolean
-  reservation_time?: boolean
+  reservation_datetime?: boolean
+  end_datetime?: boolean
   duration_hours?: boolean
   diners_count?: boolean
   notes?: boolean
   status?: boolean
+  created_by?: boolean
   created_at?: boolean
   updated_at?: boolean
+  confirmed_by?: boolean
+  confirmed_at?: boolean
+  cancel_reason?: boolean
+  cancelled_by?: boolean
+  cancelled_at?: boolean
 }
 
-export type reservationsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "table_id" | "client_name" | "client_phone" | "client_email" | "reservation_date" | "reservation_time" | "duration_hours" | "diners_count" | "notes" | "status" | "created_at" | "updated_at", ExtArgs["result"]["reservations"]>
+export type reservationsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "table_id" | "client_name" | "client_phone" | "client_email" | "reservation_datetime" | "end_datetime" | "duration_hours" | "diners_count" | "notes" | "status" | "created_by" | "created_at" | "updated_at" | "confirmed_by" | "confirmed_at" | "cancel_reason" | "cancelled_by" | "cancelled_at", ExtArgs["result"]["reservations"]>
 export type reservationsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }
 export type reservationsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }
 export type reservationsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   table?: boolean | Prisma.tablesDefaultArgs<ExtArgs>
+  creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
+  confirmer?: boolean | Prisma.reservations$confirmerArgs<ExtArgs>
+  canceller?: boolean | Prisma.reservations$cancellerArgs<ExtArgs>
 }
 
 export type $reservationsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "reservations"
   objects: {
     table: Prisma.$tablesPayload<ExtArgs>
+    creator: Prisma.$usersPayload<ExtArgs>
+    confirmer: Prisma.$usersPayload<ExtArgs> | null
+    canceller: Prisma.$usersPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     table_id: string
     client_name: string
-    client_phone: string | null
+    client_phone: string
     client_email: string | null
-    reservation_date: Date
-    reservation_time: Date
-    duration_hours: runtime.Decimal
+    reservation_datetime: Date
+    end_datetime: Date
+    duration_hours: number
     diners_count: number
     notes: string | null
-    status: string
+    status: $Enums.reservation_status
+    created_by: string
     created_at: Date
     updated_at: Date
+    confirmed_by: string | null
+    confirmed_at: Date | null
+    cancel_reason: string | null
+    cancelled_by: string | null
+    cancelled_at: Date | null
   }, ExtArgs["result"]["reservations"]>
   composites: {}
 }
@@ -1214,6 +2031,9 @@ readonly fields: reservationsFieldRefs;
 export interface Prisma__reservationsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   table<T extends Prisma.tablesDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.tablesDefaultArgs<ExtArgs>>): Prisma.Prisma__tablesClient<runtime.Types.Result.GetResult<Prisma.$tablesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  creator<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  confirmer<T extends Prisma.reservations$confirmerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.reservations$confirmerArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  canceller<T extends Prisma.reservations$cancellerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.reservations$cancellerArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1248,14 +2068,20 @@ export interface reservationsFieldRefs {
   readonly client_name: Prisma.FieldRef<"reservations", 'String'>
   readonly client_phone: Prisma.FieldRef<"reservations", 'String'>
   readonly client_email: Prisma.FieldRef<"reservations", 'String'>
-  readonly reservation_date: Prisma.FieldRef<"reservations", 'DateTime'>
-  readonly reservation_time: Prisma.FieldRef<"reservations", 'DateTime'>
-  readonly duration_hours: Prisma.FieldRef<"reservations", 'Decimal'>
+  readonly reservation_datetime: Prisma.FieldRef<"reservations", 'DateTime'>
+  readonly end_datetime: Prisma.FieldRef<"reservations", 'DateTime'>
+  readonly duration_hours: Prisma.FieldRef<"reservations", 'Int'>
   readonly diners_count: Prisma.FieldRef<"reservations", 'Int'>
   readonly notes: Prisma.FieldRef<"reservations", 'String'>
-  readonly status: Prisma.FieldRef<"reservations", 'String'>
+  readonly status: Prisma.FieldRef<"reservations", 'reservation_status'>
+  readonly created_by: Prisma.FieldRef<"reservations", 'String'>
   readonly created_at: Prisma.FieldRef<"reservations", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"reservations", 'DateTime'>
+  readonly confirmed_by: Prisma.FieldRef<"reservations", 'String'>
+  readonly confirmed_at: Prisma.FieldRef<"reservations", 'DateTime'>
+  readonly cancel_reason: Prisma.FieldRef<"reservations", 'String'>
+  readonly cancelled_by: Prisma.FieldRef<"reservations", 'String'>
+  readonly cancelled_at: Prisma.FieldRef<"reservations", 'DateTime'>
 }
     
 
@@ -1649,6 +2475,44 @@ export type reservationsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many reservations to delete.
    */
   limit?: number
+}
+
+/**
+ * reservations.confirmer
+ */
+export type reservations$confirmerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
+}
+
+/**
+ * reservations.canceller
+ */
+export type reservations$cancellerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
 }
 
 /**

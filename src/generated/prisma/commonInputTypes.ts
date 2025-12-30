@@ -538,6 +538,23 @@ export type Enumtipo_nota_creditoWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumtipo_nota_creditoFilter<$PrismaModel>
 }
 
+export type Enumreservation_statusFilter<$PrismaModel = never> = {
+  equals?: $Enums.reservation_status | Prisma.Enumreservation_statusFieldRefInput<$PrismaModel>
+  in?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel> | $Enums.reservation_status
+}
+
+export type Enumreservation_statusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.reservation_status | Prisma.Enumreservation_statusFieldRefInput<$PrismaModel>
+  in?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumreservation_statusWithAggregatesFilter<$PrismaModel> | $Enums.reservation_status
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel>
+}
+
 export type IntNullableFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -1069,6 +1086,23 @@ export type NestedEnumtipo_nota_creditoWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumtipo_nota_creditoFilter<$PrismaModel>
   _max?: Prisma.NestedEnumtipo_nota_creditoFilter<$PrismaModel>
+}
+
+export type NestedEnumreservation_statusFilter<$PrismaModel = never> = {
+  equals?: $Enums.reservation_status | Prisma.Enumreservation_statusFieldRefInput<$PrismaModel>
+  in?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel> | $Enums.reservation_status
+}
+
+export type NestedEnumreservation_statusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.reservation_status | Prisma.Enumreservation_statusFieldRefInput<$PrismaModel>
+  in?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.reservation_status[] | Prisma.ListEnumreservation_statusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumreservation_statusWithAggregatesFilter<$PrismaModel> | $Enums.reservation_status
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumreservation_statusFilter<$PrismaModel>
 }
 
 export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {

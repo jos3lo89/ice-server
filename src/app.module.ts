@@ -18,6 +18,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { OrderItemsModule } from './modules/order-items/order-items.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SalesModule } from './modules/sales/sales.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SalesModule } from './modules/sales/sales.module';
     OrderItemsModule,
     PaymentsModule,
     SalesModule,
+    ReservationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
