@@ -13,6 +13,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { PrintersModule } from './modules/printers/printers.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { CashRegistersModule } from './modules/cash-registers/cash-registers.module';
+import { CashMovementsModule } from './modules/cash-movements/cash-movements.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CashRegistersModule } from './modules/cash-registers/cash-registers.mod
     PrintersModule,
     ClientsModule,
     CashRegistersModule,
+    CashMovementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
