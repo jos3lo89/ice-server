@@ -11,6 +11,7 @@ import { TablesModule } from './modules/tables/tables.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { PrintersModule } from './modules/printers/printers.module';
+import { ClientsModule } from './modules/clients/clients.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PrintersModule } from './modules/printers/printers.module';
     CategoriesModule,
     ProductsModule,
     PrintersModule,
+    ClientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

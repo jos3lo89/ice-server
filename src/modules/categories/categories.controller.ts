@@ -11,13 +11,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import {
-  ApiCookieAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { CreateCategoryDto } from './dto/create-category.dto';
