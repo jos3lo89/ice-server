@@ -1,9 +1,10 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
-import { ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { Role } from 'src/common/enums/role.enum';
 
+@ApiTags('Gestión del panel')
 @Controller('dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
