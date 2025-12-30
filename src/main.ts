@@ -13,11 +13,12 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      forbidNonWhitelisted: true, // lanzar error si se manda dato no solicitados
     }),
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Ice Mankora')
+    .setTitle('ICE MANKORA API')
     .setDescription(
       'Documentación oficial de la API para el sistema Ice Mankora.',
     )
