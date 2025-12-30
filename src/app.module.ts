@@ -16,6 +16,8 @@ import { CashRegistersModule } from './modules/cash-registers/cash-registers.mod
 import { CashMovementsModule } from './modules/cash-movements/cash-movements.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { OrderItemsModule } from './modules/order-items/order-items.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { SalesModule } from './modules/sales/sales.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { OrderItemsModule } from './modules/order-items/order-items.module';
     CashMovementsModule,
     OrdersModule,
     OrderItemsModule,
+    PaymentsModule,
+    SalesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

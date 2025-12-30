@@ -6,5 +6,6 @@ import { CashRegistersService } from '../cash-registers/cash-registers.service';
 @Module({
   controllers: [CashMovementsController],
   providers: [CashMovementsService, CashRegistersService],
+  exports: [CashMovementsService],
 })
 export class CashMovementsModule {}
