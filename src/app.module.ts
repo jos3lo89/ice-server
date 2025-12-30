@@ -20,6 +20,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     SalesModule,
     ReservationsModule,
     DashboardModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
