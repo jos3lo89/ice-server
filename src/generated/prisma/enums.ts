@@ -138,3 +138,12 @@ export const tipo_nota_credito = {
 } as const
 
 export type tipo_nota_credito = (typeof tipo_nota_credito)[keyof typeof tipo_nota_credito]
+
+
+export const reservation_status = {
+  PENDIENTE: 'PENDIENTE',
+  CONFIRMADA: 'CONFIRMADA',
+  CANCELADA: 'CANCELADA'
+} as const
+
+export type reservation_status = (typeof reservation_status)[keyof typeof reservation_status]

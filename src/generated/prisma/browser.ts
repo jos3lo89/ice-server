@@ -139,7 +139,7 @@ export type daily_summaries = Prisma.daily_summariesModel
 export type voided_documents = Prisma.voided_documentsModel
 /**
  * Model reservations
- * Reservaciones
+ * 
  */
 export type reservations = Prisma.reservationsModel
 /**

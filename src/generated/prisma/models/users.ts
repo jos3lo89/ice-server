@@ -298,6 +298,9 @@ export type usersWhereInput = {
   sales?: Prisma.SalesListRelationFilter
   credit_notes?: Prisma.Credit_notesListRelationFilter
   audit_logs?: Prisma.Audit_logsListRelationFilter
+  reservations_created?: Prisma.ReservationsListRelationFilter
+  reservations_confirmed?: Prisma.ReservationsListRelationFilter
+  reservations_cancelled?: Prisma.ReservationsListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -325,6 +328,9 @@ export type usersOrderByWithRelationInput = {
   sales?: Prisma.salesOrderByRelationAggregateInput
   credit_notes?: Prisma.credit_notesOrderByRelationAggregateInput
   audit_logs?: Prisma.audit_logsOrderByRelationAggregateInput
+  reservations_created?: Prisma.reservationsOrderByRelationAggregateInput
+  reservations_confirmed?: Prisma.reservationsOrderByRelationAggregateInput
+  reservations_cancelled?: Prisma.reservationsOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +361,9 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   sales?: Prisma.SalesListRelationFilter
   credit_notes?: Prisma.Credit_notesListRelationFilter
   audit_logs?: Prisma.Audit_logsListRelationFilter
+  reservations_created?: Prisma.ReservationsListRelationFilter
+  reservations_confirmed?: Prisma.ReservationsListRelationFilter
+  reservations_cancelled?: Prisma.ReservationsListRelationFilter
 }, "id" | "dni" | "username">
 
 export type usersOrderByWithAggregationInput = {
@@ -424,6 +433,9 @@ export type usersCreateInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -451,6 +463,9 @@ export type usersUncheckedCreateInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUpdateInput = {
@@ -478,6 +493,9 @@ export type usersUpdateInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -505,6 +523,9 @@ export type usersUncheckedUpdateInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -763,6 +784,52 @@ export type usersUpdateOneRequiredWithoutCredit_notesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutCredit_notesInput, Prisma.usersUpdateWithoutCredit_notesInput>, Prisma.usersUncheckedUpdateWithoutCredit_notesInput>
 }
 
+export type usersCreateNestedOneWithoutReservations_createdInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_createdInput, Prisma.usersUncheckedCreateWithoutReservations_createdInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_createdInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutReservations_confirmedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_confirmedInput, Prisma.usersUncheckedCreateWithoutReservations_confirmedInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_confirmedInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutReservations_cancelledInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_cancelledInput, Prisma.usersUncheckedCreateWithoutReservations_cancelledInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_cancelledInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutReservations_createdNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_createdInput, Prisma.usersUncheckedCreateWithoutReservations_createdInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_createdInput
+  upsert?: Prisma.usersUpsertWithoutReservations_createdInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutReservations_createdInput, Prisma.usersUpdateWithoutReservations_createdInput>, Prisma.usersUncheckedUpdateWithoutReservations_createdInput>
+}
+
+export type usersUpdateOneWithoutReservations_confirmedNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_confirmedInput, Prisma.usersUncheckedCreateWithoutReservations_confirmedInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_confirmedInput
+  upsert?: Prisma.usersUpsertWithoutReservations_confirmedInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutReservations_confirmedInput, Prisma.usersUpdateWithoutReservations_confirmedInput>, Prisma.usersUncheckedUpdateWithoutReservations_confirmedInput>
+}
+
+export type usersUpdateOneWithoutReservations_cancelledNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutReservations_cancelledInput, Prisma.usersUncheckedCreateWithoutReservations_cancelledInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutReservations_cancelledInput
+  upsert?: Prisma.usersUpsertWithoutReservations_cancelledInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutReservations_cancelledInput, Prisma.usersUpdateWithoutReservations_cancelledInput>, Prisma.usersUncheckedUpdateWithoutReservations_cancelledInput>
+}
+
 export type usersCreateNestedOneWithoutAudit_logsInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutAudit_logsInput, Prisma.usersUncheckedCreateWithoutAudit_logsInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutAudit_logsInput
@@ -803,6 +870,9 @@ export type usersCreateWithoutUser_floorsInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutUser_floorsInput = {
@@ -829,6 +899,9 @@ export type usersUncheckedCreateWithoutUser_floorsInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutUser_floorsInput = {
@@ -871,6 +944,9 @@ export type usersUpdateWithoutUser_floorsInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_floorsInput = {
@@ -897,6 +973,9 @@ export type usersUncheckedUpdateWithoutUser_floorsInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutOrdersInput = {
@@ -923,6 +1002,9 @@ export type usersCreateWithoutOrdersInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutOrdersInput = {
@@ -949,6 +1031,9 @@ export type usersUncheckedCreateWithoutOrdersInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutOrdersInput = {
@@ -991,6 +1076,9 @@ export type usersUpdateWithoutOrdersInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutOrdersInput = {
@@ -1017,6 +1105,9 @@ export type usersUncheckedUpdateWithoutOrdersInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutOrder_items_createdInput = {
@@ -1043,6 +1134,9 @@ export type usersCreateWithoutOrder_items_createdInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutOrder_items_createdInput = {
@@ -1069,6 +1163,9 @@ export type usersUncheckedCreateWithoutOrder_items_createdInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutOrder_items_createdInput = {
@@ -1100,6 +1197,9 @@ export type usersCreateWithoutOrder_items_cancelledInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutOrder_items_cancelledInput = {
@@ -1126,6 +1226,9 @@ export type usersUncheckedCreateWithoutOrder_items_cancelledInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutOrder_items_cancelledInput = {
@@ -1168,6 +1271,9 @@ export type usersUpdateWithoutOrder_items_createdInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutOrder_items_createdInput = {
@@ -1194,6 +1300,9 @@ export type usersUncheckedUpdateWithoutOrder_items_createdInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUpsertWithoutOrder_items_cancelledInput = {
@@ -1231,6 +1340,9 @@ export type usersUpdateWithoutOrder_items_cancelledInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutOrder_items_cancelledInput = {
@@ -1257,6 +1369,9 @@ export type usersUncheckedUpdateWithoutOrder_items_cancelledInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutCash_registersInput = {
@@ -1283,6 +1398,9 @@ export type usersCreateWithoutCash_registersInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutCash_registersInput = {
@@ -1309,6 +1427,9 @@ export type usersUncheckedCreateWithoutCash_registersInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutCash_registersInput = {
@@ -1351,6 +1472,9 @@ export type usersUpdateWithoutCash_registersInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCash_registersInput = {
@@ -1377,6 +1501,9 @@ export type usersUncheckedUpdateWithoutCash_registersInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutCash_movementsInput = {
@@ -1403,6 +1530,9 @@ export type usersCreateWithoutCash_movementsInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutCash_movementsInput = {
@@ -1429,6 +1559,9 @@ export type usersUncheckedCreateWithoutCash_movementsInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutCash_movementsInput = {
@@ -1471,6 +1604,9 @@ export type usersUpdateWithoutCash_movementsInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCash_movementsInput = {
@@ -1497,6 +1633,9 @@ export type usersUncheckedUpdateWithoutCash_movementsInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutPaymentsInput = {
@@ -1523,6 +1662,9 @@ export type usersCreateWithoutPaymentsInput = {
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutPaymentsInput = {
@@ -1549,6 +1691,9 @@ export type usersUncheckedCreateWithoutPaymentsInput = {
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutPaymentsInput = {
@@ -1591,6 +1736,9 @@ export type usersUpdateWithoutPaymentsInput = {
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPaymentsInput = {
@@ -1617,6 +1765,9 @@ export type usersUncheckedUpdateWithoutPaymentsInput = {
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutSalesInput = {
@@ -1643,6 +1794,9 @@ export type usersCreateWithoutSalesInput = {
   payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutSalesInput = {
@@ -1669,6 +1823,9 @@ export type usersUncheckedCreateWithoutSalesInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutSalesInput = {
@@ -1711,6 +1868,9 @@ export type usersUpdateWithoutSalesInput = {
   payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutSalesInput = {
@@ -1737,6 +1897,9 @@ export type usersUncheckedUpdateWithoutSalesInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersCreateWithoutCredit_notesInput = {
@@ -1763,6 +1926,9 @@ export type usersCreateWithoutCredit_notesInput = {
   payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutCredit_notesInput = {
@@ -1789,6 +1955,9 @@ export type usersUncheckedCreateWithoutCredit_notesInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutCredit_notesInput = {
@@ -1831,6 +2000,9 @@ export type usersUpdateWithoutCredit_notesInput = {
   payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCredit_notesInput = {
@@ -1857,6 +2029,405 @@ export type usersUncheckedUpdateWithoutCredit_notesInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
+}
+
+export type usersCreateWithoutReservations_createdInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
+}
+
+export type usersUncheckedCreateWithoutReservations_createdInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersUncheckedCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersUncheckedCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsUncheckedCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
+}
+
+export type usersCreateOrConnectWithoutReservations_createdInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_createdInput, Prisma.usersUncheckedCreateWithoutReservations_createdInput>
+}
+
+export type usersCreateWithoutReservations_confirmedInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
+}
+
+export type usersUncheckedCreateWithoutReservations_confirmedInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersUncheckedCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersUncheckedCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsUncheckedCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
+}
+
+export type usersCreateOrConnectWithoutReservations_confirmedInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_confirmedInput, Prisma.usersUncheckedCreateWithoutReservations_confirmedInput>
+}
+
+export type usersCreateWithoutReservations_cancelledInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+}
+
+export type usersUncheckedCreateWithoutReservations_cancelledInput = {
+  id?: string
+  name: string
+  dni: string
+  username: string
+  password_hash: string
+  role?: $Enums.user_role
+  pin?: string | null
+  is_active?: boolean
+  last_login_at?: Date | string | null
+  last_login_ip?: string | null
+  failed_login_attempts?: number
+  locked_until?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user_floors?: Prisma.user_floorsUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.ordersUncheckedCreateNestedManyWithoutUserInput
+  order_items_created?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCreatorInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedCreateNestedManyWithoutCancellerInput
+  cash_registers?: Prisma.cash_registersUncheckedCreateNestedManyWithoutUserInput
+  cash_movements?: Prisma.cash_movementsUncheckedCreateNestedManyWithoutCreatorInput
+  payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
+  sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
+  credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
+  audit_logs?: Prisma.audit_logsUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+}
+
+export type usersCreateOrConnectWithoutReservations_cancelledInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_cancelledInput, Prisma.usersUncheckedCreateWithoutReservations_cancelledInput>
+}
+
+export type usersUpsertWithoutReservations_createdInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutReservations_createdInput, Prisma.usersUncheckedUpdateWithoutReservations_createdInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_createdInput, Prisma.usersUncheckedCreateWithoutReservations_createdInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutReservations_createdInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutReservations_createdInput, Prisma.usersUncheckedUpdateWithoutReservations_createdInput>
+}
+
+export type usersUpdateWithoutReservations_createdInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
+}
+
+export type usersUncheckedUpdateWithoutReservations_createdInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUncheckedUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUncheckedUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUncheckedUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUncheckedUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
+}
+
+export type usersUpsertWithoutReservations_confirmedInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutReservations_confirmedInput, Prisma.usersUncheckedUpdateWithoutReservations_confirmedInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_confirmedInput, Prisma.usersUncheckedCreateWithoutReservations_confirmedInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutReservations_confirmedInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutReservations_confirmedInput, Prisma.usersUncheckedUpdateWithoutReservations_confirmedInput>
+}
+
+export type usersUpdateWithoutReservations_confirmedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
+}
+
+export type usersUncheckedUpdateWithoutReservations_confirmedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUncheckedUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUncheckedUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUncheckedUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUncheckedUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
+}
+
+export type usersUpsertWithoutReservations_cancelledInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutReservations_cancelledInput, Prisma.usersUncheckedUpdateWithoutReservations_cancelledInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutReservations_cancelledInput, Prisma.usersUncheckedCreateWithoutReservations_cancelledInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutReservations_cancelledInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutReservations_cancelledInput, Prisma.usersUncheckedUpdateWithoutReservations_cancelledInput>
+}
+
+export type usersUpdateWithoutReservations_cancelledInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+}
+
+export type usersUncheckedUpdateWithoutReservations_cancelledInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  dni?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  last_login_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_login_ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  failed_login_attempts?: Prisma.IntFieldUpdateOperationsInput | number
+  locked_until?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user_floors?: Prisma.user_floorsUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.ordersUncheckedUpdateManyWithoutUserNestedInput
+  order_items_created?: Prisma.order_itemsUncheckedUpdateManyWithoutCreatorNestedInput
+  order_items_cancelled?: Prisma.order_itemsUncheckedUpdateManyWithoutCancellerNestedInput
+  cash_registers?: Prisma.cash_registersUncheckedUpdateManyWithoutUserNestedInput
+  cash_movements?: Prisma.cash_movementsUncheckedUpdateManyWithoutCreatorNestedInput
+  payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
+  sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
+  credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
+  audit_logs?: Prisma.audit_logsUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
 }
 
 export type usersCreateWithoutAudit_logsInput = {
@@ -1883,6 +2454,9 @@ export type usersCreateWithoutAudit_logsInput = {
   payments?: Prisma.paymentsCreateNestedManyWithoutProcessorInput
   sales?: Prisma.salesCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsCreateNestedManyWithoutCancellerInput
 }
 
 export type usersUncheckedCreateWithoutAudit_logsInput = {
@@ -1909,6 +2483,9 @@ export type usersUncheckedCreateWithoutAudit_logsInput = {
   payments?: Prisma.paymentsUncheckedCreateNestedManyWithoutProcessorInput
   sales?: Prisma.salesUncheckedCreateNestedManyWithoutUserInput
   credit_notes?: Prisma.credit_notesUncheckedCreateNestedManyWithoutUserInput
+  reservations_created?: Prisma.reservationsUncheckedCreateNestedManyWithoutCreatorInput
+  reservations_confirmed?: Prisma.reservationsUncheckedCreateNestedManyWithoutConfirmerInput
+  reservations_cancelled?: Prisma.reservationsUncheckedCreateNestedManyWithoutCancellerInput
 }
 
 export type usersCreateOrConnectWithoutAudit_logsInput = {
@@ -1951,6 +2528,9 @@ export type usersUpdateWithoutAudit_logsInput = {
   payments?: Prisma.paymentsUpdateManyWithoutProcessorNestedInput
   sales?: Prisma.salesUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUpdateManyWithoutCancellerNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAudit_logsInput = {
@@ -1977,6 +2557,9 @@ export type usersUncheckedUpdateWithoutAudit_logsInput = {
   payments?: Prisma.paymentsUncheckedUpdateManyWithoutProcessorNestedInput
   sales?: Prisma.salesUncheckedUpdateManyWithoutUserNestedInput
   credit_notes?: Prisma.credit_notesUncheckedUpdateManyWithoutUserNestedInput
+  reservations_created?: Prisma.reservationsUncheckedUpdateManyWithoutCreatorNestedInput
+  reservations_confirmed?: Prisma.reservationsUncheckedUpdateManyWithoutConfirmerNestedInput
+  reservations_cancelled?: Prisma.reservationsUncheckedUpdateManyWithoutCancellerNestedInput
 }
 
 
@@ -1995,6 +2578,9 @@ export type UsersCountOutputType = {
   sales: number
   credit_notes: number
   audit_logs: number
+  reservations_created: number
+  reservations_confirmed: number
+  reservations_cancelled: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2008,6 +2594,9 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   sales?: boolean | UsersCountOutputTypeCountSalesArgs
   credit_notes?: boolean | UsersCountOutputTypeCountCredit_notesArgs
   audit_logs?: boolean | UsersCountOutputTypeCountAudit_logsArgs
+  reservations_created?: boolean | UsersCountOutputTypeCountReservations_createdArgs
+  reservations_confirmed?: boolean | UsersCountOutputTypeCountReservations_confirmedArgs
+  reservations_cancelled?: boolean | UsersCountOutputTypeCountReservations_cancelledArgs
 }
 
 /**
@@ -2090,6 +2679,27 @@ export type UsersCountOutputTypeCountAudit_logsArgs<ExtArgs extends runtime.Type
   where?: Prisma.audit_logsWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountReservations_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.reservationsWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountReservations_confirmedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.reservationsWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountReservations_cancelledArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.reservationsWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2116,6 +2726,9 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sales?: boolean | Prisma.users$salesArgs<ExtArgs>
   credit_notes?: boolean | Prisma.users$credit_notesArgs<ExtArgs>
   audit_logs?: boolean | Prisma.users$audit_logsArgs<ExtArgs>
+  reservations_created?: boolean | Prisma.users$reservations_createdArgs<ExtArgs>
+  reservations_confirmed?: boolean | Prisma.users$reservations_confirmedArgs<ExtArgs>
+  reservations_cancelled?: boolean | Prisma.users$reservations_cancelledArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -2182,6 +2795,9 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   sales?: boolean | Prisma.users$salesArgs<ExtArgs>
   credit_notes?: boolean | Prisma.users$credit_notesArgs<ExtArgs>
   audit_logs?: boolean | Prisma.users$audit_logsArgs<ExtArgs>
+  reservations_created?: boolean | Prisma.users$reservations_createdArgs<ExtArgs>
+  reservations_confirmed?: boolean | Prisma.users$reservations_confirmedArgs<ExtArgs>
+  reservations_cancelled?: boolean | Prisma.users$reservations_cancelledArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2200,6 +2816,9 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     sales: Prisma.$salesPayload<ExtArgs>[]
     credit_notes: Prisma.$credit_notesPayload<ExtArgs>[]
     audit_logs: Prisma.$audit_logsPayload<ExtArgs>[]
+    reservations_created: Prisma.$reservationsPayload<ExtArgs>[]
+    reservations_confirmed: Prisma.$reservationsPayload<ExtArgs>[]
+    reservations_cancelled: Prisma.$reservationsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2620,6 +3239,9 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   sales<T extends Prisma.users$salesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$salesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$salesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   credit_notes<T extends Prisma.users$credit_notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$credit_notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$credit_notesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   audit_logs<T extends Prisma.users$audit_logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$audit_logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$audit_logsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reservations_created<T extends Prisma.users$reservations_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$reservations_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$reservationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reservations_confirmed<T extends Prisma.users$reservations_confirmedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$reservations_confirmedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$reservationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reservations_cancelled<T extends Prisma.users$reservations_cancelledArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$reservations_cancelledArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$reservationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3288,6 +3910,78 @@ export type users$audit_logsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.Audit_logsScalarFieldEnum | Prisma.Audit_logsScalarFieldEnum[]
+}
+
+/**
+ * users.reservations_created
+ */
+export type users$reservations_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the reservations
+   */
+  select?: Prisma.reservationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the reservations
+   */
+  omit?: Prisma.reservationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.reservationsInclude<ExtArgs> | null
+  where?: Prisma.reservationsWhereInput
+  orderBy?: Prisma.reservationsOrderByWithRelationInput | Prisma.reservationsOrderByWithRelationInput[]
+  cursor?: Prisma.reservationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReservationsScalarFieldEnum | Prisma.ReservationsScalarFieldEnum[]
+}
+
+/**
+ * users.reservations_confirmed
+ */
+export type users$reservations_confirmedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the reservations
+   */
+  select?: Prisma.reservationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the reservations
+   */
+  omit?: Prisma.reservationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.reservationsInclude<ExtArgs> | null
+  where?: Prisma.reservationsWhereInput
+  orderBy?: Prisma.reservationsOrderByWithRelationInput | Prisma.reservationsOrderByWithRelationInput[]
+  cursor?: Prisma.reservationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReservationsScalarFieldEnum | Prisma.ReservationsScalarFieldEnum[]
+}
+
+/**
+ * users.reservations_cancelled
+ */
+export type users$reservations_cancelledArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the reservations
+   */
+  select?: Prisma.reservationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the reservations
+   */
+  omit?: Prisma.reservationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.reservationsInclude<ExtArgs> | null
+  where?: Prisma.reservationsWhereInput
+  orderBy?: Prisma.reservationsOrderByWithRelationInput | Prisma.reservationsOrderByWithRelationInput[]
+  cursor?: Prisma.reservationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReservationsScalarFieldEnum | Prisma.ReservationsScalarFieldEnum[]
 }
 
 /**

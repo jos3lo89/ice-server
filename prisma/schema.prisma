@@ -182,16 +182,19 @@ model users {
   updated_at            DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
 
   // Relaciones
-  user_floors           user_floors[]
-  orders                orders[]
-  order_items_created   order_items[]    @relation("CreatedBy")
-  order_items_cancelled order_items[]    @relation("CancelledBy")
-  cash_registers        cash_registers[]
-  cash_movements        cash_movements[]
-  payments              payments[]
-  sales                 sales[]
-  credit_notes          credit_notes[]
-  audit_logs            audit_logs[]
+  user_floors            user_floors[]
+  orders                 orders[]
+  order_items_created    order_items[]    @relation("CreatedBy")
+  order_items_cancelled  order_items[]    @relation("CancelledBy")
+  cash_registers         cash_registers[]
+  cash_movements         cash_movements[]
+  payments               payments[]
+  sales                  sales[]
+  credit_notes           credit_notes[]
+  audit_logs             audit_logs[]
+  reservations_created   reservations[]   @relation("ReservationCreator")
+  reservations_confirmed reservations[]   @relation("ReservationConfirmer")
+  reservations_cancelled reservations[]   @relation("ReservationCanceller")
 }
 
 /// Relación usuarios-pisos (muchos a muchos)
@@ -705,26 +708,54 @@ model voided_documents {
 }
 
 /// Reservaciones
+enum reservation_status {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+}
+
 model reservations {
-  id               String   @id @default(uuid()) @db.Uuid
-  table_id         String   @db.Uuid
-  client_name      String   @db.VarChar(255)
-  client_phone     String?  @db.VarChar(20)
-  client_email     String?  @db.VarChar(100)
-  reservation_date DateTime @db.Date
-  reservation_time DateTime @db.Time(6)
-  duration_hours   Decimal  @default(2) @db.Decimal(3, 1)
-  diners_count     Int
-  notes            String?  @db.Text
-  status           String   @default("CONFIRMADA") @db.VarChar(20)
-  created_at       DateTime @default(now()) @db.Timestamptz(6)
-  updated_at       DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  id       String @id @default(uuid()) @db.Uuid
+  table_id String @db.Uuid
+
+  // Cliente
+  client_name  String  @db.VarChar(255)
+  client_phone String  @db.VarChar(20)
+  client_email String? @db.VarChar(100)
+
+  // Fecha y hora
+  reservation_datetime DateTime @db.Timestamptz(6)
+  end_datetime         DateTime @db.Timestamptz(6)
+  duration_hours       Int      @default(2)
+
+  // Detalles
+  diners_count Int
+  notes        String?            @db.Text
+  status       reservation_status @default(PENDIENTE)
+
+  // Auditoría - Creación
+  created_by String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Auditoría - Confirmación
+  confirmed_by String?   @db.Uuid
+  confirmed_at DateTime? @db.Timestamptz(6)
+
+  // Auditoría - Cancelación
+  cancel_reason String?   @db.VarChar(500)
+  cancelled_by  String?   @db.Uuid
+  cancelled_at  DateTime? @db.Timestamptz(6)
 
   // Relaciones
-  table tables @relation(fields: [table_id], references: [id])
+  table     tables @relation(fields: [table_id], references: [id])
+  creator   users  @relation("ReservationCreator", fields: [created_by], references: [id])
+  confirmer users? @relation("ReservationConfirmer", fields: [confirmed_by], references: [id])
+  canceller users? @relation("ReservationCanceller", fields: [cancelled_by], references: [id])
 
-  @@index([reservation_date, reservation_time], name: "idx_reservations_date")
-  @@index([table_id], name: "idx_reservations_table")
+  @@index([reservation_datetime])
+  @@index([table_id, status])
+  @@index([status])
 }
 
 /// Historial de órdenes (para reportes)
