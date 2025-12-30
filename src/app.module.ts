@@ -21,6 +21,7 @@ import { SalesModule } from './modules/sales/sales.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     ReservationsModule,
     DashboardModule,
     ReportsModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],
