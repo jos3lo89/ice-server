@@ -13,16 +13,9 @@ import { CreateFloorDto } from './dto/create-floor.dto';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { UpdateFloorDto } from './dto/update-floor.dto';
-import {
-  ApiCookieAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Gestión de Pisos')
-@ApiCookieAuth()
 @Controller('floors')
 export class FloorsController {
   constructor(private readonly floorsService: FloorsService) {}
