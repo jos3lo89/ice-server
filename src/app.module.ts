@@ -7,6 +7,10 @@ import { envValidationSchema } from './config/env.validation';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { FloorsModule } from './modules/floors/floors.module';
+import { TablesModule } from './modules/tables/tables.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { ProductsModule } from './modules/products/products.module';
+import { PrintersModule } from './modules/printers/printers.module';
 
 @Module({
   imports: [
@@ -19,6 +23,10 @@ import { FloorsModule } from './modules/floors/floors.module';
     AuthModule,
     UsersModule,
     FloorsModule,
+    TablesModule,
+    CategoriesModule,
+    ProductsModule,
+    PrintersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
