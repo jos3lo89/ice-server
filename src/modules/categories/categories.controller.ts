@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -36,7 +37,7 @@ export class CategoriesController {
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 403, description: 'Sin permisos' })
   @ApiResponse({ status: 409, description: 'Slug duplicado' })
-  async create(@Body() createCategoryDto: CreateCategoryDto) {
+  create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
 
@@ -50,7 +51,7 @@ export class CategoriesController {
     status: 200,
     description: 'Lista de categorías',
   })
-  async findAll() {
+  findAll() {
     return this.categoriesService.findAll();
   }
 
@@ -65,7 +66,7 @@ export class CategoriesController {
     status: 200,
     description: 'Árbol de categorías',
   })
-  async findTree() {
+  findTree() {
     return this.categoriesService.findTree();
   }
 
@@ -85,7 +86,7 @@ export class CategoriesController {
     description: 'Categoría encontrada',
   })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
-  async findBySlug(@Param('slug') slug: string) {
+  findBySlug(@Param('slug') slug: string) {
     return this.categoriesService.findBySlug(slug);
   }
 
@@ -106,7 +107,18 @@ export class CategoriesController {
   })
   @ApiResponse({ status: 400, description: 'UUID inválido' })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID proporcionado no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.categoriesService.findOne(id);
   }
 
@@ -128,8 +140,17 @@ export class CategoriesController {
   @ApiResponse({ status: 400, description: 'Datos inválidos o UUID inválido' })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
   @ApiResponse({ status: 409, description: 'Slug duplicado' })
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
+  update(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID proporcionado no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
     return this.categoriesService.update(id, updateCategoryDto);
@@ -163,9 +184,18 @@ export class CategoriesController {
     description: 'Tiene productos o subcategorías asociadas',
   })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
-  async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<{ message: string }> {
+  remove(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID proporcionado no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.categoriesService.remove(id);
   }
 }

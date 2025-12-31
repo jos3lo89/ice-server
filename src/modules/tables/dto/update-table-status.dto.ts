@@ -10,8 +10,8 @@ export class UpdateTableStatusDto {
   })
   @IsNotEmpty({ message: 'El estado de la mesa es obligatorio.' })
   @IsEnum(table_status, {
-    message:
-      'El estado seleccionado no es válido. Opciones permitidas: LIBRE, OCUPADA, RESERVADA, LIMPIEZA.',
+    message: (args) =>
+      `"${args.value}" no es un estado válido. Use uno de estos: ${Object.values(table_status).join(', ')}`,
   })
   status: table_status;
 }

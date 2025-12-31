@@ -7,6 +7,7 @@ import {
   IsBoolean,
   MaxLength,
   Min,
+  IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { area_preparacion } from 'src/generated/prisma/enums';
@@ -17,8 +18,9 @@ export class CreateCategoryDto {
     example: 'Postres',
     maxLength: 100,
   })
-  @IsString()
-  @MaxLength(100)
+  @IsNotEmpty({ message: 'El nombre de la categoría es obligatorio.' })
+  @IsString({ message: 'El nombre debe ser una cadena de texto.' })
+  @MaxLength(100, { message: 'El nombre no puede exceder los 100 caracteres.' })
   name: string;
 
   @ApiProperty({
@@ -26,8 +28,9 @@ export class CreateCategoryDto {
     example: 'postres',
     maxLength: 100,
   })
-  @IsString()
-  @MaxLength(100)
+  @IsNotEmpty({ message: 'El slug es obligatorio para la URL.' })
+  @IsString({ message: 'El slug debe ser una cadena de texto.' })
+  @MaxLength(100, { message: 'El slug no puede exceder los 100 caracteres.' })
   slug: string;
 
   @ApiPropertyOptional({
@@ -36,35 +39,42 @@ export class CreateCategoryDto {
     maxLength: 255,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
+  @IsString({ message: 'La descripción debe ser una cadena de texto.' })
+  @MaxLength(255, {
+    message: 'La descripción no puede exceder los 255 caracteres.',
+  })
   description?: string;
 
   @ApiPropertyOptional({
     description: 'ID de la categoría padre (para subcategorías)',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-1234',
   })
   @IsOptional()
-  @IsUUID()
+  @IsUUID('4', {
+    message: 'El ID de la categoría padre debe ser un ID válido.',
+  })
   parent_id?: string;
 
   @ApiProperty({
     description: 'Área de preparación por defecto',
     enum: area_preparacion,
-    example: 'COCINA',
+    example: 'BEBIDAS',
     default: 'COCINA',
   })
-  @IsEnum(area_preparacion)
+  @IsEnum(area_preparacion, {
+    message: (args) =>
+      `El área "${args.value}" no es válida. Use una de estas: ${Object.values(area_preparacion).join(', ')}`,
+  })
   default_area: area_preparacion;
 
   @ApiPropertyOptional({
     description: 'Orden de visualización',
-    example: 1,
-    default: 0,
+    example: 3,
+    default: 1,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsInt({ message: 'El orden de visualización debe ser un número entero.' })
+  @Min(1, { message: 'El orden de visualización no puede ser menor a 1.' })
   display_order?: number;
 
   @ApiPropertyOptional({
@@ -73,8 +83,10 @@ export class CreateCategoryDto {
     maxLength: 50,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
+  @IsString({ message: 'El nombre del icono debe ser una cadena de texto.' })
+  @MaxLength(50, {
+    message: 'El nombre del icono no puede exceder los 50 caracteres.',
+  })
   icon?: string;
 
   @ApiPropertyOptional({
@@ -83,8 +95,11 @@ export class CreateCategoryDto {
     maxLength: 7,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(7)
+  @IsString({ message: 'El código de color debe ser una cadena de texto.' })
+  @MaxLength(7, {
+    message:
+      'El código de color debe tener el formato #XXXXXX (máximo 7 caracteres).',
+  })
   color?: string;
 
   @ApiPropertyOptional({
@@ -93,8 +108,10 @@ export class CreateCategoryDto {
     maxLength: 500,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(500)
+  @IsString({ message: 'La ruta de la imagen debe ser una cadena de texto.' })
+  @MaxLength(500, {
+    message: 'La ruta de la imagen es demasiado larga (máximo 500 caracteres).',
+  })
   image_path?: string;
 
   @ApiPropertyOptional({
@@ -103,6 +120,8 @@ export class CreateCategoryDto {
     default: true,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({
+    message: 'El estado activo debe ser un valor booleano (true/false).',
+  })
   is_active?: boolean;
 }
