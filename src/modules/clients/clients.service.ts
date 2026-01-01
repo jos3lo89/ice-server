@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -15,13 +17,11 @@ import { UpdateClientDto } from './dto/update-client.dto';
 
 @Injectable()
 export class ClientsService {
+  private readonly logger = new Logger(ClientsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Crear un nuevo cliente
-   */
   async create(createClientDto: CreateClientDto) {
-    // Validar que no exista otro cliente con el mismo documento
     const existingClient = await this.prisma.clients.findFirst({
       where: {
         tipo_documento: createClientDto.tipo_documento,
@@ -35,7 +35,6 @@ export class ClientsService {
       );
     }
 
-    // Validaciones específicas por tipo de documento
     this.validateDocumentByType(
       createClientDto.tipo_documento,
       createClientDto.numero_documento,
@@ -46,7 +45,11 @@ export class ClientsService {
         data: createClientDto,
       });
 
-      return client;
+      return {
+        success: true,
+        message: 'Cliente creado exitosamente',
+        data: client,
+      };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -55,32 +58,41 @@ export class ClientsService {
           );
         }
       }
-      throw error;
+
+      this.logger.error('Error al crear cliente', error);
+      throw new InternalServerErrorException('Error interno al crear cliente');
     }
   }
 
-  /**
-   * Listar todos los clientes activos
-   */
   async findAll() {
-    const clients = await this.prisma.clients.findMany({
-      where: { is_active: true },
-      orderBy: [{ last_visit_at: 'desc' }, { razon_social: 'asc' }],
-    });
+    try {
+      const clients = await this.prisma.clients.findMany({
+        where: { is_active: true },
+        orderBy: [{ last_visit_at: 'desc' }, { razon_social: 'asc' }],
+      });
 
-    return clients;
+      return {
+        success: true,
+        message: 'Clientes obtenidos exitosamente',
+        data: clients.map((c) => ({
+          ...c,
+          total_purchases: Number(c.total_purchases),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al obtener clientes', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener clientes',
+      );
+    }
   }
 
-  /**
-   * Buscar clientes por criterios
-   */
   async search(searchDto: SearchClientDto) {
     const where: clientsWhereInput = {
       is_active: true,
       AND: [],
     };
 
-    // Buscar por documento
     if (searchDto.documento) {
       (where.AND as clientsWhereInput[]).push({
         numero_documento: {
@@ -89,14 +101,12 @@ export class ClientsService {
       });
     }
 
-    // Filtrar por tipo de documento
     if (searchDto.tipo) {
       (where.AND as clientsWhereInput[]).push({
         tipo_documento: searchDto.tipo,
       });
     }
 
-    // Buscar por nombre
     if (searchDto.nombre) {
       (where.AND as clientsWhereInput[]).push({
         OR: [
@@ -116,7 +126,6 @@ export class ClientsService {
       });
     }
 
-    // Buscar por email
     if (searchDto.email) {
       (where.AND as clientsWhereInput[]).push({
         email: {
@@ -126,37 +135,87 @@ export class ClientsService {
       });
     }
 
-    // Si no hay filtros, eliminar AND vacío
     if ((where.AND as any[]).length === 0) {
       delete where.AND;
     }
 
-    const clients = await this.prisma.clients.findMany({
-      where,
-      orderBy: [{ last_visit_at: 'desc' }, { razon_social: 'asc' }],
-      take: 50, // Limitar resultados
-    });
+    try {
+      const clients = await this.prisma.clients.findMany({
+        where,
+        orderBy: [{ last_visit_at: 'desc' }, { razon_social: 'asc' }],
+        take: 50,
+      });
 
-    return clients;
+      return {
+        success: true,
+        message: 'Resultados de búsqueda obtenidos exitosamente',
+        data: clients.map((c) => ({
+          ...c,
+          total_purchases: Number(c.total_purchases),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al buscar clientes', error);
+      throw new InternalServerErrorException(
+        'Error interno al buscar clientes',
+      );
+    }
   }
 
-  /**
-   * Buscar cliente por número de documento exacto
-   */
-  async findByDocument(documento: string) {
-    const client = await this.prisma.clients.findFirst({
-      where: {
-        numero_documento: documento,
-        is_active: true,
-      },
-    });
+  async getFrequentClients() {
+    try {
+      const clients = await this.prisma.clients.findMany({
+        where: {
+          is_active: true,
+          visit_count: { gt: 0 },
+        },
+        orderBy: [{ visit_count: 'desc' }, { total_purchases: 'desc' }],
+        take: 10,
+      });
 
-    return client;
+      return {
+        success: true,
+        message: 'Clientes frecuentes obtenidos exitosamente',
+        data: clients.map((c) => ({
+          ...c,
+          total_purchases: Number(c.total_purchases),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al obtener clientes frecuentes', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener clientes frecuentes',
+      );
+    }
   }
 
-  /**
-   * Obtener cliente por ID con estadísticas
-   */
+  async getVIPClients() {
+    try {
+      const clients = await this.prisma.clients.findMany({
+        where: {
+          is_active: true,
+          total_purchases: { gt: 0 },
+        },
+        orderBy: [{ total_purchases: 'desc' }, { visit_count: 'desc' }],
+        take: 10,
+      });
+
+      return {
+        success: true,
+        message: 'Clientes VIP obtenidos exitosamente',
+        data: clients.map((c) => ({
+          ...c,
+          total_purchases: Number(c.total_purchases),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al obtener clientes VIP', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener clientes VIP',
+      );
+    }
+  }
+
   async findOne(id: string) {
     const client = await this.prisma.clients.findUnique({
       where: { id },
@@ -179,26 +238,37 @@ export class ClientsService {
       throw new NotFoundException(`Cliente con ID "${id}" no encontrado`);
     }
 
-    // Calcular estadísticas
     const stats = await this.calculateClientStats(id);
 
     return {
-      ...client,
-      stats,
-      recent_sales: client.sales,
+      success: true,
+      message: 'Detalle del cliente obtenido exitosamente',
+      data: {
+        ...client,
+        stats,
+        recent_sales: client.sales,
+      },
     };
   }
 
-  /**
-   * Actualizar cliente
-   */
+  async findByDocument(documento: string) {
+    const client = await this.prisma.clients.findFirst({
+      where: {
+        numero_documento: documento,
+        is_active: true,
+      },
+    });
+
+    return client;
+  }
+
   async update(id: string, updateClientDto: UpdateClientDto) {
     const existingClient = await this.prisma.clients.findUnique({
       where: { id },
     });
 
     if (!existingClient) {
-      throw new NotFoundException(`Cliente con ID "${id}" no encontrado`);
+      throw new NotFoundException('Cliente no encontrado');
     }
 
     try {
@@ -207,7 +277,14 @@ export class ClientsService {
         data: updateClientDto,
       });
 
-      return client;
+      return {
+        success: true,
+        message: 'Cliente actualizado exitosamente',
+        data: {
+          ...client,
+          total_purchases: Number(client.total_purchases),
+        },
+      };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -216,35 +293,40 @@ export class ClientsService {
           );
         }
       }
-      throw error;
+      this.logger.error('Error al actualizar cliente', error);
+      throw new InternalServerErrorException(
+        'Error interno al actualizar cliente',
+      );
     }
   }
 
-  /**
-   * Desactivar cliente (soft delete)
-   */
-  async remove(id: string): Promise<{ message: string }> {
+  async remove(id: string) {
     const client = await this.prisma.clients.findUnique({
       where: { id },
     });
 
     if (!client) {
-      throw new NotFoundException(`Cliente con ID "${id}" no encontrado`);
+      throw new NotFoundException('Cliente no encontrado');
     }
+    try {
+      await this.prisma.clients.update({
+        where: { id },
+        data: { is_active: false },
+      });
 
-    await this.prisma.clients.update({
-      where: { id },
-      data: { is_active: false },
-    });
-
-    return {
-      message: `Cliente "${client.razon_social}" desactivado exitosamente`,
-    };
+      return {
+        success: true,
+        message: `Cliente "${client.razon_social}" desactivado exitosamente`,
+        data: null,
+      };
+    } catch (error) {
+      this.logger.error('Error al desactivar cliente', error);
+      throw new InternalServerErrorException(
+        'Error interno al desactivar cliente',
+      );
+    }
   }
 
-  /**
-   * Actualizar estadísticas del cliente después de una venta
-   */
   async updateStats(clientId: string, amount: number): Promise<void> {
     const client = await this.prisma.clients.findUnique({
       where: { id: clientId },
@@ -268,9 +350,6 @@ export class ClientsService {
     });
   }
 
-  /**
-   * Calcular estadísticas del cliente
-   */
   private async calculateClientStats(clientId: string) {
     const sales = await this.prisma.sales.findMany({
       where: { client_id: clientId },
@@ -323,10 +402,7 @@ export class ClientsService {
     };
   }
 
-  /**
-   * Validar documento según tipo
-   */
-  private validateDocumentByType(tipo: string, numero: string): void {
+  private validateDocumentByType(tipo: string, numero: string) {
     switch (tipo) {
       case 'DNI':
         if (!/^\d{8}$/.test(numero)) {
@@ -342,7 +418,7 @@ export class ClientsService {
             'RUC debe tener exactamente 11 dígitos numéricos',
           );
         }
-        // Validar que RUC empiece con 10, 15, 17 o 20
+        // vailidar que RUC empiece con 10, 15, 17 o 20
         const firstTwo = numero.substring(0, 2);
         if (!['10', '15', '17', '20'].includes(firstTwo)) {
           throw new BadRequestException(
@@ -368,43 +444,10 @@ export class ClientsService {
         break;
 
       case 'SIN_DOC':
-        // Sin validación específica
         break;
 
       default:
         throw new BadRequestException(`Tipo de documento "${tipo}" no válido`);
     }
-  }
-
-  /**
-   * Obtener clientes frecuentes (top 10 por visitas)
-   */
-  async getFrequentClients() {
-    const clients = await this.prisma.clients.findMany({
-      where: {
-        is_active: true,
-        visit_count: { gt: 0 },
-      },
-      orderBy: [{ visit_count: 'desc' }, { total_purchases: 'desc' }],
-      take: 10,
-    });
-
-    return clients;
-  }
-
-  /**
-   * Obtener clientes VIP (top 10 por compras)
-   */
-  async getVIPClients() {
-    const clients = await this.prisma.clients.findMany({
-      where: {
-        is_active: true,
-        total_purchases: { gt: 0 },
-      },
-      orderBy: [{ total_purchases: 'desc' }, { visit_count: 'desc' }],
-      take: 10,
-    });
-
-    return clients;
   }
 }

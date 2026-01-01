@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsEmail } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { tipo_documento_identidad } from 'src/generated/prisma/enums';
 
@@ -8,7 +8,7 @@ export class SearchClientDto {
     example: '20123456789',
   })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El número de documento debe ser una cadena de texto.' })
   documento?: string;
 
   @ApiPropertyOptional({
@@ -16,7 +16,10 @@ export class SearchClientDto {
     enum: tipo_documento_identidad,
   })
   @IsOptional()
-  @IsEnum(tipo_documento_identidad)
+  @IsEnum(tipo_documento_identidad, {
+    message: (args) =>
+      `"${args.value}" no es un tipo de documento válido. Use uno de estos: ${Object.values(tipo_documento_identidad).join(', ')}`,
+  })
   tipo?: tipo_documento_identidad;
 
   @ApiPropertyOptional({
@@ -24,7 +27,7 @@ export class SearchClientDto {
     example: 'Juan',
   })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El nombre de búsqueda debe ser una cadena de texto.' })
   nombre?: string;
 
   @ApiPropertyOptional({
@@ -32,6 +35,7 @@ export class SearchClientDto {
     example: 'cliente@email.com',
   })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El correo electrónico debe ser una cadena de texto.' })
+  @IsEmail({}, { message: 'El formato del correo electrónico no es válido.' })
   email?: string;
 }
