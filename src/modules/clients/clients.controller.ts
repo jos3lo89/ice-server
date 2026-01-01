@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,6 +23,8 @@ import {
 import { CreateClientDto } from './dto/create-client.dto';
 import { SearchClientDto } from './dto/search-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
 @ApiTags('Gestión de clientes')
 @Controller('clients')
@@ -29,6 +32,7 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Crear cliente',
     description: 'Crea un nuevo cliente para facturación. ADMIN y CAJERO.',
@@ -52,6 +56,7 @@ export class ClientsController {
   }
 
   @Get()
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Listar clientes',
     description: 'Obtiene todos los clientes activos. ADMIN y CAJERO.',
@@ -65,6 +70,7 @@ export class ClientsController {
   }
 
   @Get('search')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Buscar clientes',
     description:
@@ -103,6 +109,7 @@ export class ClientsController {
   }
 
   @Get('frequent')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Clientes frecuentes',
     description: 'Obtiene los 10 clientes con más visitas. ADMIN y CAJERO.',
@@ -116,6 +123,7 @@ export class ClientsController {
   }
 
   @Get('vip')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Clientes VIP',
     description:
@@ -130,6 +138,7 @@ export class ClientsController {
   }
 
   @Get(':id')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Obtener cliente por ID',
     description:
@@ -138,19 +147,31 @@ export class ClientsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del cliente',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Detalle del cliente',
+    description: 'Detalle del cliente obtenido exitosamente',
   })
   @ApiResponse({ status: 400, description: 'UUID inválido' })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del cliente no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.clientsService.findOne(id);
   }
 
   @Patch(':id')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Actualizar cliente',
     description:
@@ -159,23 +180,33 @@ export class ClientsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del cliente',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Cliente actualizado',
+    description: 'Cliente actualizado exitosamente',
   })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   @ApiResponse({ status: 409, description: 'Datos únicos duplicados' })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del cliente no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() updateClientDto: UpdateClientDto,
   ) {
     return this.clientsService.update(id, updateClientDto);
   }
 
   @Delete(':id')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Desactivar cliente',
@@ -184,22 +215,32 @@ export class ClientsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del cliente',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Cliente desactivado',
+    description: 'Cliente desactivado exitosamente',
     schema: {
       example: {
         success: true,
-        data: { message: 'Cliente "Juan Pérez" desactivado exitosamente' },
+        message: 'Cliente "Juan Pérez" desactivado exitosamente',
+        data: null,
       },
     },
   })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado' })
   async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<{ message: string }> {
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del cliente no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.clientsService.remove(id);
   }
 }
