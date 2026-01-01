@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -10,16 +12,13 @@ import { cash_movement_type } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class CashMovementsService {
+  private readonly logger = new Logger(CashMovementsService.name);
   constructor(
     private readonly prisma: PrismaService,
     private readonly cashRegistersService: CashRegistersService,
   ) {}
 
-  /**
-   * Crear un movimiento de caja (ingreso o egreso manual)
-   */
   async create(userId: string, createCashMovementDto: CreateCashMovementDto) {
-    // Obtener caja abierta del usuario
     const cashRegisterId =
       await this.cashRegistersService.getOpenCashRegisterId(userId);
 
@@ -39,7 +38,6 @@ export class CashMovementsService {
       throw new NotFoundException('Caja no encontrada');
     }
 
-    // Validar que no se cree un egreso que deje la caja en negativo
     if (createCashMovementDto.type === cash_movement_type.EGRESO) {
       const newBalance =
         Number(cashRegister.expected_amount) - createCashMovementDto.amount;
@@ -50,7 +48,6 @@ export class CashMovementsService {
       }
     }
 
-    // Crear movimiento
     const movement = await this.prisma.cash_movements.create({
       data: {
         cash_register_id: cashRegisterId,
@@ -70,32 +67,30 @@ export class CashMovementsService {
       },
     });
 
-    // Actualizar totales de la caja
     await this.cashRegistersService.updateTotals(cashRegisterId);
 
-    // Calcular nuevo balance
     const updatedCashRegister = await this.prisma.cash_registers.findUnique({
       where: { id: cashRegisterId },
       select: { expected_amount: true },
     });
 
     return {
-      id: movement.id,
-      type: movement.type,
-      amount: Number(movement.amount),
-      description: movement.description,
-      is_automatic: movement.is_automatic,
-      created_by: movement.creator.name,
-      created_at: movement.created_at,
-      new_balance: Number(updatedCashRegister?.expected_amount || 0),
+      success: true,
+      message: 'Movimiento registrado exitosamente',
+      data: {
+        id: movement.id,
+        type: movement.type,
+        amount: Number(movement.amount),
+        description: movement.description,
+        is_automatic: movement.is_automatic,
+        created_by: movement.creator.name,
+        created_at: movement.created_at,
+        new_balance: Number(updatedCashRegister?.expected_amount || 0),
+      },
     };
   }
 
-  /**
-   * Obtener movimientos de la caja actual del usuario
-   */
   async findByCurrentCashRegister(userId: string) {
-    // Obtener caja abierta del usuario
     const cashRegisterId =
       await this.cashRegistersService.getOpenCashRegisterId(userId);
 
@@ -103,34 +98,44 @@ export class CashMovementsService {
       throw new BadRequestException('No tiene una caja abierta');
     }
 
-    return this.findByCashRegister(cashRegisterId);
+    const result = await this.findByCashRegister(cashRegisterId);
+
+    return {
+      success: true,
+      message: 'Movimientos de caja actual obtenidos exitosamente',
+      data: result,
+    };
   }
 
-  /**
-   * Obtener movimientos de una caja específica
-   */
   async findByCashRegister(cashRegisterId: string) {
-    const movements = await this.prisma.cash_movements.findMany({
-      where: { cash_register_id: cashRegisterId },
-      include: {
-        creator: {
-          select: {
-            name: true,
+    try {
+      const movements = await this.prisma.cash_movements.findMany({
+        where: { cash_register_id: cashRegisterId },
+        include: {
+          creator: {
+            select: {
+              name: true,
+            },
           },
         },
-      },
-      orderBy: { created_at: 'desc' },
-    });
+        orderBy: { created_at: 'desc' },
+      });
 
-    return movements.map((movement) => ({
-      id: movement.id,
-      type: movement.type,
-      amount: Number(movement.amount),
-      description: movement.description,
-      is_automatic: movement.is_automatic,
-      created_by: movement.creator.name,
-      created_at: movement.created_at,
-    }));
+      return movements.map((movement) => ({
+        id: movement.id,
+        type: movement.type,
+        amount: Number(movement.amount),
+        description: movement.description,
+        is_automatic: movement.is_automatic,
+        created_by: movement.creator.name,
+        created_at: movement.created_at,
+      }));
+    } catch (error) {
+      this.logger.error('Error al obtener movimientos de caja', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener movimientos de caja',
+      );
+    }
   }
 
   /**

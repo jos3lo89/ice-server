@@ -3,14 +3,11 @@ import {
   CanActivate,
   ExecutionContext,
   BadRequestException,
-  UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CashRegistersService } from '../../modules/cash-registers/cash-registers.service';
 import { REQUIRE_CASH_REGISTER_KEY } from '../decorators/requireCashRegister.decorator';
-import { Request } from 'express';
-import { CurrentUserI } from '../interfaces/userActive.interface';
 
 @Injectable()
 export class CashRegisterGuard implements CanActivate {
@@ -42,14 +39,14 @@ export class CashRegisterGuard implements CanActivate {
         success: false,
         error: {
           code: 'CASH_REGISTER_REQUIRED',
-          message:
-            'Debe abrir una caja para realizar esta operación. Use POST /cash-registers/open',
+          message: 'Debe abrir una caja para realizar esta operación',
         },
       });
     }
 
     const cashRegisterId =
       await this.cashRegistersService.getOpenCashRegisterId(user.sub);
+
     request['cashRegisterId'] = cashRegisterId;
 
     return true;
