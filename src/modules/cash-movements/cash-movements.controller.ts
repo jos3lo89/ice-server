@@ -18,7 +18,6 @@ import { Role } from 'src/common/enums/role.enum';
 import { CreateCashMovementDto } from './dto/create-cash-movement.dto';
 import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
 import { RequireCashRegister } from 'src/common/decorators/requireCashRegister.decorator';
-import { CurrentCash } from 'src/common/decorators/CurrentCash.decorator';
 
 @ApiTags('Gestión de movimientos de efectivo')
 @Controller('cash-movements')
