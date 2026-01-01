@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -15,13 +16,10 @@ import { ordersWhereInput } from 'src/generated/prisma/models';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Crear una nueva orden
-   */
   async create(userId: string, createOrderDto: CreateOrderDto) {
-    // Verificar si la mesa existe
     const table = await this.prisma.tables.findUnique({
       where: { id: createOrderDto.table_id },
       include: {
@@ -34,12 +32,9 @@ export class OrdersService {
     });
 
     if (!table) {
-      throw new NotFoundException(
-        `Mesa con ID "${createOrderDto.table_id}" no encontrada`,
-      );
+      throw new NotFoundException('Mesa no encontrada');
     }
 
-    // Verificar si hay una orden activa para la mesa
     const activeOrder = await this.prisma.orders.findFirst({
       where: {
         table_id: createOrderDto.table_id,
@@ -55,7 +50,6 @@ export class OrdersService {
       );
     }
 
-    // Obtener el último número del día
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -69,50 +63,58 @@ export class OrdersService {
 
     const dailyNumber = (lastOrder?.daily_number || 0) + 1;
 
-    // Crear orden
-    const order = await this.prisma.orders.create({
-      data: {
-        daily_number: dailyNumber,
-        order_date: today,
-        user_id: userId,
-        table_id: createOrderDto.table_id,
-        diners_count: createOrderDto.diners_count,
-        notes: createOrderDto.notes,
-        status: order_status.ABIERTA,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
+    try {
+      const order = await this.prisma.orders.create({
+        data: {
+          daily_number: dailyNumber,
+          order_date: today,
+          user_id: userId,
+          table_id: createOrderDto.table_id,
+          diners_count: createOrderDto.diners_count,
+          notes: createOrderDto.notes,
+          status: order_status.ABIERTA,
         },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
-              select: {
-                name: true,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          table: {
+            select: {
+              number: true,
+              name: true,
+              floor: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      });
 
-    return {
-      id: order.id,
-      daily_number: order.daily_number,
-      order_date: order.order_date.toISOString().split('T')[0],
-      table_number: order.table.number,
-      table_name: order.table.name,
-      floor_name: order.table.floor.name,
-      diners_count: order.diners_count,
-      user: order.user.name,
-      status: order.status,
-      created_at: order.created_at,
-      message: `Orden #${order.daily_number} creada exitosamente para Mesa ${order.table.number} (${order.table.floor.name})`,
-    };
+      return {
+        success: true,
+        message: `Orden #${order.daily_number} creada para la mesa #${order.table.number} (${order.table.floor.name})`,
+        data: {
+          id: order.id,
+          daily_number: order.daily_number,
+          order_date: order.order_date.toISOString().split('T')[0],
+          table_number: order.table.number,
+          table_name: order.table.name,
+          floor_name: order.table.floor.name,
+          diners_count: order.diners_count,
+          user: order.user.name,
+          status: order.status,
+          created_at: order.created_at,
+          message: `Orden #${order.daily_number} creada exitosamente para Mesa ${order.table.number} (${order.table.floor.name})`,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Error interno al crear la orden', error);
+      throw new BadRequestException('Error interno al crear la orden');
+    }
   }
 
   /**

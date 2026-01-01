@@ -43,7 +43,7 @@ export class OrderItemsService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Orden con ID "${orderId}" no encontrada`);
+      throw new NotFoundException('Orden no encontrada');
     }
 
     if (order.status !== order_status.ABIERTA) {
@@ -64,14 +64,12 @@ export class OrderItemsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Producto con ID "${createOrderItemDto.product_id}" no encontrado`,
-      );
+      throw new NotFoundException('Producto no encontrado');
     }
 
     if (!product.is_active || !product.is_available) {
       throw new BadRequestException(
-        `El producto "${product.name}" no está disponible`,
+        `El producto ${product.name} no está disponible`,
       );
     }
 

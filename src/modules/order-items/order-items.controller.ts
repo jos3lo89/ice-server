@@ -22,6 +22,7 @@ import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { KitchenDisplayQueryDto } from './dto/kitchen-display-query.dto';
 import { SendToKitchenDto } from './dto/send-to-kitchen.dto';
 import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
+import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
 
 @ApiTags('Gestión de items del pedido')
 @Controller('order-items')
@@ -67,12 +68,12 @@ export class OrderItemsController {
   @ApiResponse({ status: 404, description: 'Orden o producto no encontrado' })
   async addItem(
     @Param('orderId', ParseUUIDPipe) orderId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() createOrderItemDto: CreateOrderItemDto,
   ) {
     const result = await this.orderItemsService.addItem(
       orderId,
-      userId,
+      user.sub,
       createOrderItemDto,
     );
     return {
