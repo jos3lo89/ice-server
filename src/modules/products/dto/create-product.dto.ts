@@ -10,6 +10,7 @@ import {
   Min,
   ValidateNested,
   IsArray,
+  IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -21,7 +22,8 @@ export class CreateProductDto {
     description: 'ID de la categoría',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @IsUUID()
+  @IsNotEmpty({ message: 'La categoría es obligatoria.' })
+  @IsUUID('4', { message: 'El ID de la categoría debe ser un UUID válido.' })
   category_id: string;
 
   @ApiProperty({
@@ -29,8 +31,9 @@ export class CreateProductDto {
     example: 'Lomo Saltado',
     maxLength: 255,
   })
-  @IsString()
-  @MaxLength(255)
+  @IsNotEmpty({ message: 'El nombre del producto es obligatorio.' })
+  @IsString({ message: 'El nombre debe ser una cadena de texto.' })
+  @MaxLength(255, { message: 'El nombre no puede exceder los 255 caracteres.' })
   name: string;
 
   @ApiPropertyOptional({
@@ -39,8 +42,10 @@ export class CreateProductDto {
     maxLength: 50,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
+  @IsString({ message: 'El nombre corto debe ser una cadena de texto.' })
+  @MaxLength(50, {
+    message: 'El nombre corto no puede exceder los 50 caracteres.',
+  })
   short_name?: string;
 
   @ApiPropertyOptional({
@@ -48,15 +53,19 @@ export class CreateProductDto {
     example: 'Lomo fino salteado con papas fritas y arroz',
   })
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'La descripción debe ser una cadena de texto.' })
   description?: string;
 
   @ApiProperty({
     description: 'Precio de venta',
     example: 42.0,
   })
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0)
+  @IsNotEmpty({ message: 'El precio es obligatorio.' })
+  @IsNumber(
+    { maxDecimalPlaces: 2 },
+    { message: 'El precio debe ser un número con máximo 2 decimales.' },
+  )
+  @Min(0, { message: 'El precio no puede ser menor a 0.' })
   price: number;
 
   @ApiPropertyOptional({
@@ -65,8 +74,11 @@ export class CreateProductDto {
     default: 0,
   })
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0)
+  @IsNumber(
+    { maxDecimalPlaces: 2 },
+    { message: 'El costo debe ser un número válido.' },
+  )
+  @Min(0, { message: 'El costo no puede ser menor a 0.' })
   cost?: number;
 
   @ApiProperty({
@@ -74,7 +86,11 @@ export class CreateProductDto {
     enum: area_preparacion,
     example: 'COCINA',
   })
-  @IsEnum(area_preparacion)
+  @IsNotEmpty({ message: 'El área de preparación es obligatoria.' })
+  @IsEnum(area_preparacion, {
+    message: (args) =>
+      `"${args.value}" no es un área válida. Use: ${Object.values(area_preparacion).join(', ')}`,
+  })
   area_preparacion: area_preparacion;
 
   @ApiPropertyOptional({
@@ -84,8 +100,11 @@ export class CreateProductDto {
     maxLength: 3,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(3)
+  @IsString({ message: 'La unidad de medida debe ser texto.' })
+  @MaxLength(3, {
+    message:
+      'La unidad de medida debe tener máximo 3 caracteres (ej: NIU, KG).',
+  })
   unidad_medida?: string;
 
   @ApiPropertyOptional({
@@ -94,8 +113,8 @@ export class CreateProductDto {
     maxLength: 30,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(30)
+  @IsString({ message: 'El código del producto debe ser texto.' })
+  @MaxLength(30, { message: 'El código no puede exceder los 30 caracteres.' })
   codigo_producto?: string;
 
   @ApiPropertyOptional({
@@ -105,8 +124,8 @@ export class CreateProductDto {
     maxLength: 2,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(2)
+  @IsString({ message: 'El código de afectación debe ser texto.' })
+  @MaxLength(2, { message: 'El código de afectación debe tener 2 caracteres.' })
   afectacion_igv?: string;
 
   @ApiPropertyOptional({
@@ -115,7 +134,7 @@ export class CreateProductDto {
     default: false,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'El valor de ICBPER debe ser un booleano.' })
   aplica_icbper?: boolean;
 
   @ApiPropertyOptional({
@@ -124,7 +143,7 @@ export class CreateProductDto {
     default: false,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'La gestión de stock debe ser verdadera o falsa.' })
   is_stock_managed?: boolean;
 
   @ApiPropertyOptional({
@@ -133,8 +152,8 @@ export class CreateProductDto {
     default: 0,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsInt({ message: 'El stock actual debe ser un número entero.' })
+  @Min(0, { message: 'El stock actual no puede ser menor a 0.' })
   stock_actual?: number;
 
   @ApiPropertyOptional({
@@ -143,8 +162,8 @@ export class CreateProductDto {
     default: 0,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsInt({ message: 'El stock mínimo debe ser un número entero.' })
+  @Min(0, { message: 'El stock mínimo no puede ser menor a 0.' })
   stock_minimo?: number;
 
   @ApiPropertyOptional({
@@ -153,8 +172,8 @@ export class CreateProductDto {
     maxLength: 500,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(500)
+  @IsString({ message: 'La ruta de la imagen debe ser texto.' })
+  @MaxLength(500, { message: 'La ruta de la imagen es demasiado larga.' })
   image_path?: string;
 
   @ApiPropertyOptional({
@@ -163,8 +182,8 @@ export class CreateProductDto {
     default: 0,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
+  @IsInt({ message: 'El orden de visualización debe ser entero.' })
+  @Min(0, { message: 'El orden no puede ser negativo.' })
   display_order?: number;
 
   @ApiPropertyOptional({
@@ -173,7 +192,7 @@ export class CreateProductDto {
     default: true,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'La disponibilidad debe ser booleana.' })
   is_available?: boolean;
 
   @ApiPropertyOptional({
@@ -182,7 +201,7 @@ export class CreateProductDto {
     default: true,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'El estado activo debe ser booleano.' })
   is_active?: boolean;
 
   @ApiPropertyOptional({
@@ -191,7 +210,7 @@ export class CreateProductDto {
     default: false,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'El valor destacado debe ser booleano.' })
   is_featured?: boolean;
 
   @ApiPropertyOptional({
@@ -199,8 +218,11 @@ export class CreateProductDto {
     type: [CreateVariantGroupDto],
   })
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
+  @IsArray({ message: 'Las variantes deben ser una lista (array).' })
+  @ValidateNested({
+    each: true,
+    message: 'Cada grupo de variantes debe ser válido.',
+  })
   @Type(() => CreateVariantGroupDto)
   variant_groups?: CreateVariantGroupDto[];
 }

@@ -171,6 +171,7 @@ model users {
   dni                   String    @unique @db.VarChar(8)
   username              String    @unique @db.VarChar(50)
   password_hash         String    @db.VarChar(255)
+  refreshToken          String?   @db.Text
   role                  user_role @default(MESERO)
   pin                   String?   @db.VarChar(6)
   is_active             Boolean   @default(true)

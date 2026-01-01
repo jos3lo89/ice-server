@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -23,7 +24,6 @@ import {
 } from './dto/product-operations.dto';
 import { CreateVariantGroupDto } from './dto/variant.dto';
 import { CreateProductDto } from './dto/create-product.dto';
-import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiTags('Gestión de productos')
 @Controller('products')
@@ -45,26 +45,26 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: 'Sin permisos' })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
   @ApiResponse({ status: 409, description: 'Código de producto duplicado' })
-  async create(@Body() createProductDto: CreateProductDto) {
+  create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
   @Get()
-  @Public()
+  @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
   @ApiOperation({
     summary: 'Listar productos',
     description: 'Obtiene todos los productos activos',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de productos',
+    description: 'Productos obtenidos exitosamente',
   })
-  async findAll() {
+  findAll() {
     return this.productsService.findAll();
   }
 
   @Get('category/:categoryId')
-  @Public()
+  @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
   @ApiOperation({
     summary: 'Productos por categoría',
     description: 'Obtiene todos los productos de una categoría específica',
@@ -72,14 +72,25 @@ export class ProductsController {
   @ApiParam({
     name: 'categoryId',
     description: 'UUID de la categoría',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de productos de la categoría',
+    description: 'Productos de la categoría obtenidos exitosamente',
   })
   @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
-  async findByCategory(@Param('categoryId', ParseUUIDPipe) categoryId: string) {
+  findByCategory(
+    @Param(
+      'categoryId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID de la categoría no es válido.');
+        },
+      }),
+    )
+    categoryId: string,
+  ) {
     return this.productsService.findByCategory(categoryId);
   }
 
@@ -101,13 +112,24 @@ export class ProductsController {
     description: 'Lista de productos del área',
   })
   async findByArea(
-    @Param('area', new ParseEnumPipe(area_preparacion)) area: area_preparacion,
+    @Param(
+      'area',
+      new ParseEnumPipe(area_preparacion, {
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException(
+            'El área de preparación no es válida.',
+          );
+        },
+      }),
+    )
+    area: area_preparacion,
   ) {
     return this.productsService.findByArea(area);
   }
 
   @Get('featured')
-  @Public()
+  @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
   @ApiOperation({
     summary: 'Productos destacados',
     description: 'Obtiene los productos marcados como destacados',
@@ -116,12 +138,12 @@ export class ProductsController {
     status: 200,
     description: 'Lista de productos destacados',
   })
-  async findFeatured() {
+  findFeatured() {
     return this.productsService.findFeatured();
   }
 
   @Get(':id')
-  @Public()
+  @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
   @ApiOperation({
     summary: 'Obtener producto por ID',
     description: 'Obtiene el detalle completo de un producto con sus variantes',
@@ -129,15 +151,26 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Detalle del producto',
+    description: 'Producto obtenido exitosamente',
   })
-  @ApiResponse({ status: 400, description: 'UUID inválido' })
+  @ApiResponse({ status: 400, description: 'ID inválido' })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.productsService.findOne(id);
   }
 
@@ -150,7 +183,7 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -160,10 +193,97 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
   @ApiResponse({ status: 409, description: 'Código de producto duplicado' })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
     return this.productsService.update(id, updateProductDto);
+  }
+
+  @Delete(':id/deactivate')
+  @Auth(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Desactivar producto',
+    description: 'Desactiva un producto (soft delete). Solo ADMIN.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID del producto',
+    example: 'uuid-v4-123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Producto desactivado',
+    schema: {
+      example: {
+        success: true,
+        message: 'Producto desactivado exitosamente',
+        data: null,
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Producto no encontrado' })
+  deactivate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
+    return this.productsService.togglState(id, false);
+  }
+
+  @Delete(':id/activate')
+  @Auth(Role.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Activar producto',
+    description: 'Activa un producto. Solo ADMIN.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID del producto',
+    example: 'uuid-v4-123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Producto activado',
+    schema: {
+      example: {
+        success: true,
+        message: 'Producto activado exitosamente',
+        data: null,
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Producto no encontrado' })
+  activate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
+  ) {
+    return this.productsService.togglState(id, true);
   }
 
   @Patch(':id/stock')
@@ -176,7 +296,7 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -184,11 +304,20 @@ export class ProductsController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Stock insuficiente o producto sin gestión de stock',
+    description: 'Stock inválido o producto sin gestión de stock',
   })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
-  async adjustStock(
-    @Param('id', ParseUUIDPipe) id: string,
+  adjustStock(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() adjustStockDto: AdjustStockDto,
   ) {
     return this.productsService.adjustStock(id, adjustStockDto);
@@ -204,15 +333,24 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
     description: 'Disponibilidad actualizada',
   })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
-  async toggleAvailability(
-    @Param('id', ParseUUIDPipe) id: string,
+  toggleAvailability(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() toggleDto: ToggleAvailabilityDto,
   ) {
     return this.productsService.toggleAvailability(id, toggleDto);
@@ -227,20 +365,30 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 201,
     description: 'Grupo de variantes agregado',
   })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
-  async addVariantGroup(
-    @Param('id', ParseUUIDPipe) id: string,
+  addVariantGroup(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
     @Body() variantGroupDto: CreateVariantGroupDto,
   ) {
     return this.productsService.addVariantGroup(id, variantGroupDto);
   }
 
+  // TODO: verficar si se elimina cuando existe el foreign key
   @Delete(':id/variants/:groupId')
   @Auth(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
@@ -251,60 +399,45 @@ export class ProductsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiParam({
     name: 'groupId',
     description: 'UUID del grupo de variantes',
-    example: '550e8400-e29b-41d4-a716-446655440001',
+    example: 'uuid-v4-456',
   })
   @ApiResponse({
     status: 200,
     description: 'Grupo de variantes eliminado',
-    schema: {
-      example: {
-        success: true,
-        data: { message: 'Grupo de variantes "Extras" eliminado exitosamente' },
-      },
-    },
   })
   @ApiResponse({
     status: 404,
     description: 'Producto o grupo de variantes no encontrado',
   })
-  async removeVariantGroup(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('groupId', ParseUUIDPipe) groupId: string,
-  ): Promise<{ message: string }> {
+  removeVariantGroup(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID del producto no es válido.');
+        },
+      }),
+    )
+    id: string,
+    @Param(
+      'groupId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException(
+            'El ID del grupo de variantes no es válido.',
+          );
+        },
+      }),
+    )
+    groupId: string,
+  ) {
     return this.productsService.removeVariantGroup(id, groupId);
-  }
-
-  @Delete(':id')
-  @Auth(Role.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Desactivar producto',
-    description: 'Desactiva un producto (soft delete). Solo ADMIN.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'UUID del producto',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Producto desactivado',
-    schema: {
-      example: {
-        success: true,
-        data: { message: 'Producto "Lomo Saltado" desactivado exitosamente' },
-      },
-    },
-  })
-  @ApiResponse({ status: 404, description: 'Producto no encontrado' })
-  async remove(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<{ message: string }> {
-    return this.productsService.remove(id);
   }
 }

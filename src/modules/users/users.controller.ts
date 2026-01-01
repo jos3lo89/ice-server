@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -14,7 +15,7 @@ import { Role } from 'src/common/enums/role.enum';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserFloorsDto } from './dto/update-user-floors.dto';
 
-@ApiTags('Usuarios')
+@ApiTags('Gestión de Usuarios')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -52,7 +53,6 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Lista de usuarios obtenida exitosamente.',
-    // type: [UserResponseDto] // Si decides crear el DTO de respuesta
   })
   @ApiResponse({
     status: 403,
@@ -74,12 +74,20 @@ export class UsersController {
     description: 'Pisos actualizados correctamente.',
   })
   @ApiResponse({ status: 400, description: 'IDs de pisos inválidos.' })
-  async assignFloors(
-    @Param('id', ParseUUIDPipe) id: string,
+  assignFloors(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de usuario inválido');
+        },
+      }),
+    )
+    id: string,
     @Body() dto: UpdateUserFloorsDto,
   ) {
-    await this.usersService.setFloors(id, dto.floorIds);
-    return { success: true, message: 'Pisos asignados correctamente' };
+    return this.usersService.setFloors(id, dto.floorIds);
   }
 
   @Patch(':id/deactivate')
@@ -92,9 +100,19 @@ export class UsersController {
     status: 200,
     description: 'Usuario desactivado exitosamente.',
   })
-  async deactivate(@Param('id', ParseUUIDPipe) id: string) {
-    await this.usersService.updateStatus(id, false);
-    return { success: true, message: 'Usuario desactivado' };
+  deactivate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de usuario inválido');
+        },
+      }),
+    )
+    id: string,
+  ) {
+    return this.usersService.updateStatus(id, false);
   }
 
   @Patch(':id/activate')
@@ -104,8 +122,18 @@ export class UsersController {
     description: 'Restaura el acceso del usuario al sistema.',
   })
   @ApiResponse({ status: 200, description: 'Usuario activado exitosamente.' })
-  async activate(@Param('id', ParseUUIDPipe) id: string) {
-    await this.usersService.updateStatus(id, true);
-    return { success: true, message: 'Usuario activado' };
+  activate(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: 400,
+        exceptionFactory() {
+          return new BadRequestException('ID de usuario inválido');
+        },
+      }),
+    )
+    id: string,
+  ) {
+    return this.usersService.updateStatus(id, true);
   }
 }

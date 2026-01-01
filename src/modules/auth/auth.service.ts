@@ -56,7 +56,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Contraseña invalida');
+      throw new UnauthorizedException('Credenciales inválidas.');
     }
 
     try {
@@ -68,16 +68,11 @@ export class AuthService {
         allowedFloorIds: userFound.user_floors.map((floor) => floor.floor.id),
       };
 
-      const accessToken = await this.jwtService.signAsync(payload, {
-        expiresIn: '1d',
-      });
-      const refreshToken = await this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-      });
+      const tokens = await this.generateTokens(payload);
 
       return {
-        accessToken,
-        refreshToken,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
         user: {
           id: userFound.id,
           name: userFound.name,
@@ -238,6 +233,84 @@ export class AuthService {
       };
     } catch (error) {
       throw new InternalServerErrorException('Error al cambiar al contraseña.');
+    }
+  }
+
+  private async generateTokens(payload: CurrentUserI) {
+    const [accessToken, refreshToken] = await Promise.all([
+      await this.jwtService.signAsync(payload, {
+        expiresIn: '1h',
+      }),
+      await this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+      }),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedToken = await bcrypt.hash(refreshToken, salt);
+    await this.prisma.users.update({
+      where: { id: userId },
+      data: { refreshToken: hashedToken },
+    });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: userId },
+      include: {
+        user_floors: {
+          include: {
+            floor: {
+              select: {
+                id: true,
+                name: true,
+                level: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('Acceso denegado');
+    }
+
+    const tokensMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!tokensMatch) {
+      throw new UnauthorizedException('Token inválido');
+    }
+
+    const payload: CurrentUserI = {
+      sub: user.id,
+      username: user.username,
+      role: user.role,
+      name: user.name,
+      allowedFloorIds: user.user_floors.map((uf) => uf.floor.id),
+    };
+
+    const tokens = await this.generateTokens(payload);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async logout(userId: string) {
+    try {
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { refreshToken: null },
+      });
+
+      return {
+        success: true,
+        message: 'Sesión cerrada correctamente en el servidor',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Error al cerrar sesión');
     }
   }
 }

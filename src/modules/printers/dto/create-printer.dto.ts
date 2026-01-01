@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsBoolean,
   IsOptional,
+  IsNotEmpty,
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -28,8 +29,9 @@ export class CreatePrinterDto {
     example: 'Impresora Cocina Principal',
     maxLength: 100,
   })
-  @IsString()
-  @MaxLength(100)
+  @IsNotEmpty({ message: 'El nombre de la impresora es obligatorio.' })
+  @IsString({ message: 'El nombre debe ser una cadena de texto.' })
+  @MaxLength(100, { message: 'El nombre no puede exceder los 100 caracteres.' })
   name: string;
 
   @ApiProperty({
@@ -37,7 +39,11 @@ export class CreatePrinterDto {
     enum: PrinterType,
     example: PrinterType.TERMICA_80,
   })
-  @IsEnum(PrinterType)
+  @IsNotEmpty({ message: 'El tipo de impresora es obligatorio.' })
+  @IsEnum(PrinterType, {
+    message: (args) =>
+      `"${args.value}" no es un tipo de impresora válido. Use: ${Object.values(PrinterType).join(', ')}`,
+  })
   type: string;
 
   @ApiProperty({
@@ -45,7 +51,11 @@ export class CreatePrinterDto {
     enum: ConnectionType,
     example: ConnectionType.NETWORK,
   })
-  @IsEnum(ConnectionType)
+  @IsNotEmpty({ message: 'El tipo de conexión es obligatorio.' })
+  @IsEnum(ConnectionType, {
+    message: (args) =>
+      `"${args.value}" no es un tipo de conexión válido. Use: ${Object.values(ConnectionType).join(', ')}`,
+  })
   connection_type: string;
 
   @ApiPropertyOptional({
@@ -54,8 +64,12 @@ export class CreatePrinterDto {
     maxLength: 255,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(255)
+  @IsString({
+    message: 'La dirección de conexión debe ser una cadena de texto.',
+  })
+  @MaxLength(255, {
+    message: 'La dirección es demasiado larga (máximo 255 caracteres).',
+  })
   address?: string;
 
   @ApiProperty({
@@ -63,7 +77,11 @@ export class CreatePrinterDto {
     enum: area_preparacion,
     example: area_preparacion.COCINA,
   })
-  @IsEnum(area_preparacion)
+  @IsNotEmpty({ message: 'El área de preparación es obligatoria.' })
+  @IsEnum(area_preparacion, {
+    message: (args) =>
+      `"${args.value}" no es un área de preparación válida. Use: ${Object.values(area_preparacion).join(', ')}`,
+  })
   area: area_preparacion;
 
   @ApiPropertyOptional({
@@ -72,7 +90,9 @@ export class CreatePrinterDto {
     default: false,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({
+    message: 'El valor "por defecto" debe ser un booleano (true/false).',
+  })
   is_default?: boolean;
 
   @ApiPropertyOptional({
@@ -81,6 +101,6 @@ export class CreatePrinterDto {
     default: true,
   })
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'El estado activo debe ser un booleano (true/false).' })
   is_active?: boolean;
 }

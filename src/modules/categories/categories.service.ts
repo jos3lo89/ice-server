@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -11,10 +13,11 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
+  private readonly logger = new Logger(CategoriesService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    // Validar que el slug sea único
     const existingSlug = await this.prisma.categories.findFirst({
       where: { slug: createCategoryDto.slug },
     });
@@ -25,7 +28,6 @@ export class CategoriesService {
       );
     }
 
-    // Si tiene parent_id, validar que exista y calcular el nivel
     let level = 0;
     if (createCategoryDto.parent_id) {
       const parent = await this.prisma.categories.findUnique({
@@ -53,91 +55,124 @@ export class CategoriesService {
           ...createCategoryDto,
           level,
         },
+        include: {
+          parent: true,
+        },
       });
 
-      return category;
+      return {
+        succes: true,
+        message: 'Categoría creada exitosamente',
+        data: category,
+      };
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException(
-            'Ya existe una categoría con estos datos únicos',
-          );
-        }
-      }
-      throw error;
+      this.logger.error(
+        `Error interno al crear categoría ${createCategoryDto.name}: ${error.message}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Error interno al crear la categoría',
+      );
     }
   }
 
   async findAll() {
-    const categories = await this.prisma.categories.findMany({
-      where: { is_active: true },
-      include: {
-        _count: {
-          select: { products: true },
-        },
-        children: {
-          where: { is_active: true },
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-            default_area: true,
-            display_order: true,
-            icon: true,
-            color: true,
-            level: true,
-            is_active: true,
-            created_at: true,
-            updated_at: true,
-            parent_id: true,
+    try {
+      const categories = await this.prisma.categories.findMany({
+        where: { is_active: true },
+        include: {
+          _count: {
+            select: { products: true },
+          },
+          children: {
+            where: { is_active: true },
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              default_area: true,
+              display_order: true,
+              icon: true,
+              color: true,
+              level: true,
+              is_active: true,
+              created_at: true,
+              updated_at: true,
+              parent_id: true,
+            },
           },
         },
-      },
-      orderBy: [{ level: 'asc' }, { display_order: 'asc' }, { name: 'asc' }],
-    });
+        orderBy: [{ level: 'asc' }, { display_order: 'asc' }, { name: 'asc' }],
+      });
 
-    return categories.map((category) => ({
-      ...category,
-      productsCount: category._count.products,
-      children: category.children.map((child) => ({
-        ...child,
-        image_path: null,
-      })),
-    }));
+      return {
+        succes: true,
+        message: 'Lista de categorías obtenida exitosamente',
+        data: categories.map((category) => ({
+          ...category,
+          productsCount: category._count.products,
+          children: category.children.map((child) => ({
+            ...child,
+            image_path: null,
+          })),
+        })),
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error interno al obtener la lista de categorías: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener la lista de categorías',
+      );
+    }
   }
 
   async findTree() {
-    const categories = await this.prisma.categories.findMany({
-      where: { is_active: true, parent_id: null },
-      include: {
-        _count: {
-          select: { products: true },
-        },
-        children: {
-          where: { is_active: true },
-          include: {
-            _count: {
-              select: { products: true },
-            },
-            children: {
-              where: { is_active: true },
-              include: {
-                _count: {
-                  select: { products: true },
+    try {
+      const categories = await this.prisma.categories.findMany({
+        where: { is_active: true, parent_id: null },
+        include: {
+          _count: {
+            select: { products: true },
+          },
+          children: {
+            where: { is_active: true },
+            include: {
+              _count: {
+                select: { products: true },
+              },
+              children: {
+                where: { is_active: true },
+                include: {
+                  _count: {
+                    select: { products: true },
+                  },
                 },
               },
             },
+            orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
           },
-          orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
         },
-      },
-      orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
-    });
+        orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
+      });
 
-    return this.buildTree(categories);
+      return {
+        succes: true,
+        message: 'Árbol de categorías obtenido exitosamente',
+        data: this.buildTree(categories),
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error interno al obtener el árbol de categorías: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener el árbol de categorías',
+      );
+    }
   }
 
+  // TODO: verificar los tipos
   private buildTree(categories: any[]) {
     return categories.map((category) => ({
       id: category.id,
@@ -152,40 +187,6 @@ export class CategoriesService {
         ? this.buildTree(category.children)
         : undefined,
     }));
-  }
-
-  async findOne(id: string) {
-    const category = await this.prisma.categories.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: { products: true },
-        },
-        products: {
-          where: { is_active: true },
-          select: {
-            id: true,
-            name: true,
-            short_name: true,
-            price: true,
-            is_available: true,
-            is_featured: true,
-            image_path: true,
-            display_order: true,
-          },
-          orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
-        },
-      },
-    });
-
-    if (!category) {
-      throw new NotFoundException(`Categoría con ID "${id}" no encontrada`);
-    }
-
-    return {
-      ...category,
-      productsCount: category._count.products,
-    };
   }
 
   async findBySlug(slug: string) {
@@ -213,7 +214,47 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Categoría con slug "${slug}" no encontrada`);
+      throw new NotFoundException(`Categoría con slug ${slug} no encontrada`);
+    }
+
+    {
+      return {
+        succes: true,
+        message: 'Categoría obtenida exitosamente',
+        data: {
+          ...category,
+          productsCount: category._count.products,
+        },
+      };
+    }
+  }
+
+  async findOne(id: string) {
+    const category = await this.prisma.categories.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { products: true },
+        },
+        products: {
+          where: { is_active: true },
+          select: {
+            id: true,
+            name: true,
+            short_name: true,
+            price: true,
+            is_available: true,
+            is_featured: true,
+            image_path: true,
+            display_order: true,
+          },
+          orderBy: [{ display_order: 'asc' }, { name: 'asc' }],
+        },
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
     }
 
     return {
@@ -223,13 +264,29 @@ export class CategoriesService {
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    // Verificar que la categoría existe
+    // Verificar que la categoría existe y contar sus hijos
     const existingCategory = await this.prisma.categories.findUnique({
       where: { id },
+      include: {
+        _count: {
+          select: { children: true },
+        },
+      },
     });
 
     if (!existingCategory) {
       throw new NotFoundException(`Categoría con ID "${id}" no encontrada`);
+    }
+
+    // Validar que una categoría con hijos no pueda convertirse en subcategoría
+    if (
+      updateCategoryDto.parent_id !== undefined &&
+      updateCategoryDto.parent_id !== null &&
+      existingCategory._count.children > 0
+    ) {
+      throw new BadRequestException(
+        `No se puede convertir esta categoría en subcategoría porque tiene ${existingCategory._count.children} subcategoría(s) asociadas. Primero debe mover o eliminar las subcategorías.`,
+      );
     }
 
     // Si se cambia el slug, validar que sea único
@@ -243,7 +300,7 @@ export class CategoriesService {
 
       if (existingSlug) {
         throw new ConflictException(
-          `Ya existe una categoría con el slug "${updateCategoryDto.slug}"`,
+          `Ya existe una categoría con el slug ${updateCategoryDto.slug}`,
         );
       }
     }
@@ -268,7 +325,7 @@ export class CategoriesService {
 
         if (!parent) {
           throw new NotFoundException(
-            `Categoría padre con ID "${updateCategoryDto.parent_id}" no encontrada`,
+            `Categoría padre con ID ${updateCategoryDto.parent_id} no encontrada`,
           );
         }
 
@@ -285,21 +342,22 @@ export class CategoriesService {
         },
       });
 
-      return category;
+      return {
+        succes: true,
+        message: 'Categoría actualizada exitosamente',
+        data: category,
+      };
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException(
-            'Ya existe una categoría con estos datos únicos',
-          );
-        }
-      }
-      throw error;
+      this.logger.error(
+        `Error interno al actualizar categoría ${id}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al actualizar la categoría',
+      );
     }
   }
 
   async remove(id: string) {
-    // Verificar que la categoría existe
     const category = await this.prisma.categories.findUnique({
       where: { id },
       include: {
@@ -310,31 +368,39 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Categoría con ID "${id}" no encontrada`);
+      throw new NotFoundException(`Categoría no encontrada`);
     }
 
-    // Validar que no tenga productos activos
     if (category._count.products > 0) {
       throw new BadRequestException(
         `No se puede eliminar la categoría porque tiene ${category._count.products} producto(s) asociado(s)`,
       );
     }
 
-    // Validar que no tenga subcategorías activas
     if (category._count.children > 0) {
       throw new BadRequestException(
         `No se puede eliminar la categoría porque tiene ${category._count.children} subcategoría(s)`,
       );
     }
 
-    // Soft delete (desactivar)
-    await this.prisma.categories.update({
-      where: { id },
-      data: { is_active: false },
-    });
+    try {
+      const category = await this.prisma.categories.update({
+        where: { id },
+        data: { is_active: false },
+      });
 
-    return {
-      message: `Categoría "${category.name}" desactivada exitosamente`,
-    };
+      return {
+        succes: true,
+        message: `Categoría "${category.name}" desactivada exitosamente`,
+        data: category,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error interno al eliminar categoría ${id}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al eliminar la categoría',
+      );
+    }
   }
 }

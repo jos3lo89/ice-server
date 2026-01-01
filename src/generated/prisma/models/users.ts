@@ -40,6 +40,7 @@ export type UsersMinAggregateOutputType = {
   dni: string | null
   username: string | null
   password_hash: string | null
+  refreshToken: string | null
   role: $Enums.user_role | null
   pin: string | null
   is_active: boolean | null
@@ -57,6 +58,7 @@ export type UsersMaxAggregateOutputType = {
   dni: string | null
   username: string | null
   password_hash: string | null
+  refreshToken: string | null
   role: $Enums.user_role | null
   pin: string | null
   is_active: boolean | null
@@ -74,6 +76,7 @@ export type UsersCountAggregateOutputType = {
   dni: number
   username: number
   password_hash: number
+  refreshToken: number
   role: number
   pin: number
   is_active: number
@@ -101,6 +104,7 @@ export type UsersMinAggregateInputType = {
   dni?: true
   username?: true
   password_hash?: true
+  refreshToken?: true
   role?: true
   pin?: true
   is_active?: true
@@ -118,6 +122,7 @@ export type UsersMaxAggregateInputType = {
   dni?: true
   username?: true
   password_hash?: true
+  refreshToken?: true
   role?: true
   pin?: true
   is_active?: true
@@ -135,6 +140,7 @@ export type UsersCountAggregateInputType = {
   dni?: true
   username?: true
   password_hash?: true
+  refreshToken?: true
   role?: true
   pin?: true
   is_active?: true
@@ -239,6 +245,7 @@ export type UsersGroupByOutputType = {
   dni: string
   username: string
   password_hash: string
+  refreshToken: string | null
   role: $Enums.user_role
   pin: string | null
   is_active: boolean
@@ -279,6 +286,7 @@ export type usersWhereInput = {
   dni?: Prisma.StringFilter<"users"> | string
   username?: Prisma.StringFilter<"users"> | string
   password_hash?: Prisma.StringFilter<"users"> | string
+  refreshToken?: Prisma.StringNullableFilter<"users"> | string | null
   role?: Prisma.Enumuser_roleFilter<"users"> | $Enums.user_role
   pin?: Prisma.StringNullableFilter<"users"> | string | null
   is_active?: Prisma.BoolFilter<"users"> | boolean
@@ -309,6 +317,7 @@ export type usersOrderByWithRelationInput = {
   dni?: Prisma.SortOrder
   username?: Prisma.SortOrder
   password_hash?: Prisma.SortOrder
+  refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   pin?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -342,6 +351,7 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.usersWhereInput | Prisma.usersWhereInput[]
   name?: Prisma.StringFilter<"users"> | string
   password_hash?: Prisma.StringFilter<"users"> | string
+  refreshToken?: Prisma.StringNullableFilter<"users"> | string | null
   role?: Prisma.Enumuser_roleFilter<"users"> | $Enums.user_role
   pin?: Prisma.StringNullableFilter<"users"> | string | null
   is_active?: Prisma.BoolFilter<"users"> | boolean
@@ -372,6 +382,7 @@ export type usersOrderByWithAggregationInput = {
   dni?: Prisma.SortOrder
   username?: Prisma.SortOrder
   password_hash?: Prisma.SortOrder
+  refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   pin?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -397,6 +408,7 @@ export type usersScalarWhereWithAggregatesInput = {
   dni?: Prisma.StringWithAggregatesFilter<"users"> | string
   username?: Prisma.StringWithAggregatesFilter<"users"> | string
   password_hash?: Prisma.StringWithAggregatesFilter<"users"> | string
+  refreshToken?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   role?: Prisma.Enumuser_roleWithAggregatesFilter<"users"> | $Enums.user_role
   pin?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   is_active?: Prisma.BoolWithAggregatesFilter<"users"> | boolean
@@ -414,6 +426,7 @@ export type usersCreateInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -444,6 +457,7 @@ export type usersUncheckedCreateInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -474,6 +488,7 @@ export type usersUpdateInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -504,6 +519,7 @@ export type usersUncheckedUpdateInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -534,6 +550,7 @@ export type usersCreateManyInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -551,6 +568,7 @@ export type usersUpdateManyMutationInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -568,6 +586,7 @@ export type usersUncheckedUpdateManyInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -585,6 +604,7 @@ export type usersCountOrderByAggregateInput = {
   dni?: Prisma.SortOrder
   username?: Prisma.SortOrder
   password_hash?: Prisma.SortOrder
+  refreshToken?: Prisma.SortOrder
   role?: Prisma.SortOrder
   pin?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -606,6 +626,7 @@ export type usersMaxOrderByAggregateInput = {
   dni?: Prisma.SortOrder
   username?: Prisma.SortOrder
   password_hash?: Prisma.SortOrder
+  refreshToken?: Prisma.SortOrder
   role?: Prisma.SortOrder
   pin?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -623,6 +644,7 @@ export type usersMinOrderByAggregateInput = {
   dni?: Prisma.SortOrder
   username?: Prisma.SortOrder
   password_hash?: Prisma.SortOrder
+  refreshToken?: Prisma.SortOrder
   role?: Prisma.SortOrder
   pin?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
@@ -852,6 +874,7 @@ export type usersCreateWithoutUser_floorsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -881,6 +904,7 @@ export type usersUncheckedCreateWithoutUser_floorsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -926,6 +950,7 @@ export type usersUpdateWithoutUser_floorsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -955,6 +980,7 @@ export type usersUncheckedUpdateWithoutUser_floorsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -984,6 +1010,7 @@ export type usersCreateWithoutOrdersInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1013,6 +1040,7 @@ export type usersUncheckedCreateWithoutOrdersInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1058,6 +1086,7 @@ export type usersUpdateWithoutOrdersInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1087,6 +1116,7 @@ export type usersUncheckedUpdateWithoutOrdersInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1116,6 +1146,7 @@ export type usersCreateWithoutOrder_items_createdInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1145,6 +1176,7 @@ export type usersUncheckedCreateWithoutOrder_items_createdInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1179,6 +1211,7 @@ export type usersCreateWithoutOrder_items_cancelledInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1208,6 +1241,7 @@ export type usersUncheckedCreateWithoutOrder_items_cancelledInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1253,6 +1287,7 @@ export type usersUpdateWithoutOrder_items_createdInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1282,6 +1317,7 @@ export type usersUncheckedUpdateWithoutOrder_items_createdInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1322,6 +1358,7 @@ export type usersUpdateWithoutOrder_items_cancelledInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1351,6 +1388,7 @@ export type usersUncheckedUpdateWithoutOrder_items_cancelledInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1380,6 +1418,7 @@ export type usersCreateWithoutCash_registersInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1409,6 +1448,7 @@ export type usersUncheckedCreateWithoutCash_registersInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1454,6 +1494,7 @@ export type usersUpdateWithoutCash_registersInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1483,6 +1524,7 @@ export type usersUncheckedUpdateWithoutCash_registersInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1512,6 +1554,7 @@ export type usersCreateWithoutCash_movementsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1541,6 +1584,7 @@ export type usersUncheckedCreateWithoutCash_movementsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1586,6 +1630,7 @@ export type usersUpdateWithoutCash_movementsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1615,6 +1660,7 @@ export type usersUncheckedUpdateWithoutCash_movementsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1644,6 +1690,7 @@ export type usersCreateWithoutPaymentsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1673,6 +1720,7 @@ export type usersUncheckedCreateWithoutPaymentsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1718,6 +1766,7 @@ export type usersUpdateWithoutPaymentsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1747,6 +1796,7 @@ export type usersUncheckedUpdateWithoutPaymentsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1776,6 +1826,7 @@ export type usersCreateWithoutSalesInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1805,6 +1856,7 @@ export type usersUncheckedCreateWithoutSalesInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1850,6 +1902,7 @@ export type usersUpdateWithoutSalesInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1879,6 +1932,7 @@ export type usersUncheckedUpdateWithoutSalesInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1908,6 +1962,7 @@ export type usersCreateWithoutCredit_notesInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1937,6 +1992,7 @@ export type usersUncheckedCreateWithoutCredit_notesInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -1982,6 +2038,7 @@ export type usersUpdateWithoutCredit_notesInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2011,6 +2068,7 @@ export type usersUncheckedUpdateWithoutCredit_notesInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2040,6 +2098,7 @@ export type usersCreateWithoutReservations_createdInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2069,6 +2128,7 @@ export type usersUncheckedCreateWithoutReservations_createdInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2103,6 +2163,7 @@ export type usersCreateWithoutReservations_confirmedInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2132,6 +2193,7 @@ export type usersUncheckedCreateWithoutReservations_confirmedInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2166,6 +2228,7 @@ export type usersCreateWithoutReservations_cancelledInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2195,6 +2258,7 @@ export type usersUncheckedCreateWithoutReservations_cancelledInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2240,6 +2304,7 @@ export type usersUpdateWithoutReservations_createdInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2269,6 +2334,7 @@ export type usersUncheckedUpdateWithoutReservations_createdInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2309,6 +2375,7 @@ export type usersUpdateWithoutReservations_confirmedInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2338,6 +2405,7 @@ export type usersUncheckedUpdateWithoutReservations_confirmedInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2378,6 +2446,7 @@ export type usersUpdateWithoutReservations_cancelledInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2407,6 +2476,7 @@ export type usersUncheckedUpdateWithoutReservations_cancelledInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2436,6 +2506,7 @@ export type usersCreateWithoutAudit_logsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2465,6 +2536,7 @@ export type usersUncheckedCreateWithoutAudit_logsInput = {
   dni: string
   username: string
   password_hash: string
+  refreshToken?: string | null
   role?: $Enums.user_role
   pin?: string | null
   is_active?: boolean
@@ -2510,6 +2582,7 @@ export type usersUpdateWithoutAudit_logsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2539,6 +2612,7 @@ export type usersUncheckedUpdateWithoutAudit_logsInput = {
   dni?: Prisma.StringFieldUpdateOperationsInput | string
   username?: Prisma.StringFieldUpdateOperationsInput | string
   password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2707,6 +2781,7 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   dni?: boolean
   username?: boolean
   password_hash?: boolean
+  refreshToken?: boolean
   role?: boolean
   pin?: boolean
   is_active?: boolean
@@ -2738,6 +2813,7 @@ export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   dni?: boolean
   username?: boolean
   password_hash?: boolean
+  refreshToken?: boolean
   role?: boolean
   pin?: boolean
   is_active?: boolean
@@ -2755,6 +2831,7 @@ export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   dni?: boolean
   username?: boolean
   password_hash?: boolean
+  refreshToken?: boolean
   role?: boolean
   pin?: boolean
   is_active?: boolean
@@ -2772,6 +2849,7 @@ export type usersSelectScalar = {
   dni?: boolean
   username?: boolean
   password_hash?: boolean
+  refreshToken?: boolean
   role?: boolean
   pin?: boolean
   is_active?: boolean
@@ -2783,7 +2861,7 @@ export type usersSelectScalar = {
   updated_at?: boolean
 }
 
-export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "dni" | "username" | "password_hash" | "role" | "pin" | "is_active" | "last_login_at" | "last_login_ip" | "failed_login_attempts" | "locked_until" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
+export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "dni" | "username" | "password_hash" | "refreshToken" | "role" | "pin" | "is_active" | "last_login_at" | "last_login_ip" | "failed_login_attempts" | "locked_until" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user_floors?: boolean | Prisma.users$user_floorsArgs<ExtArgs>
   orders?: boolean | Prisma.users$ordersArgs<ExtArgs>
@@ -2826,6 +2904,7 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     dni: string
     username: string
     password_hash: string
+    refreshToken: string | null
     role: $Enums.user_role
     pin: string | null
     is_active: boolean
@@ -3276,6 +3355,7 @@ export interface usersFieldRefs {
   readonly dni: Prisma.FieldRef<"users", 'String'>
   readonly username: Prisma.FieldRef<"users", 'String'>
   readonly password_hash: Prisma.FieldRef<"users", 'String'>
+  readonly refreshToken: Prisma.FieldRef<"users", 'String'>
   readonly role: Prisma.FieldRef<"users", 'user_role'>
   readonly pin: Prisma.FieldRef<"users", 'String'>
   readonly is_active: Prisma.FieldRef<"users", 'Boolean'>
