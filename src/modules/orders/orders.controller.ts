@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -76,14 +77,25 @@ export class OrdersController {
   @ApiParam({
     name: 'tableId',
     description: 'Identificador de mesa',
-    example: 'MESA-5',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Orden de la mesa',
+    description: 'Orden activa encontrada',
   })
   @ApiResponse({ status: 404, description: 'No hay orden activa en la mesa' })
-  async findByTable(@Param('tableId') tableId: string) {
+  async findByTable(
+    @Param(
+      'tableId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la mesa no es válido');
+        },
+      }),
+    )
+    tableId: string,
+  ) {
     return this.ordersService.findByTableId(tableId);
   }
 
@@ -95,7 +107,7 @@ export class OrdersController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de órdenes del mesero',
+    description: 'Órdenes del mesero obtenidas',
   })
   async findMyOrders(@CurrentUser() user: CurrentUserI) {
     return this.ordersService.findMyOrders(user.sub);
@@ -126,15 +138,26 @@ export class OrdersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Detalle de la orden',
+    description: 'Detalle de la orden obtenido exitosamente',
   })
   @ApiResponse({ status: 400, description: 'UUID inválido' })
   @ApiResponse({ status: 404, description: 'Orden no encontrada' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la orden debe no es válido');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.ordersService.findOne(id);
   }
 
@@ -148,7 +171,7 @@ export class OrdersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -164,7 +187,16 @@ export class OrdersController {
     description: 'La nueva mesa ya tiene orden activa',
   })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la orden debe no es válido');
+        },
+      }),
+    )
+    id: string,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     return this.ordersService.update(id, updateOrderDto);
@@ -181,7 +213,7 @@ export class OrdersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -193,7 +225,16 @@ export class OrdersController {
   })
   @ApiResponse({ status: 404, description: 'Orden no encontrada' })
   async close(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la orden debe no es válido');
+        },
+      }),
+    )
+    id: string,
     @Body() closeOrderDto: CloseOrderDto,
   ) {
     return this.ordersService.close(id, closeOrderDto);
@@ -210,7 +251,7 @@ export class OrdersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -222,7 +263,16 @@ export class OrdersController {
   })
   @ApiResponse({ status: 404, description: 'Orden no encontrada' })
   async cancel(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la orden debe no es válido');
+        },
+      }),
+    )
+    id: string,
     @Body() cancelOrderDto: CancelOrderDto,
   ) {
     return this.ordersService.cancel(id, cancelOrderDto);

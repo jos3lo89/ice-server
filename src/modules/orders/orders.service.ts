@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -201,55 +202,69 @@ export class OrdersService {
     });
 
     if (!order) {
-      return null;
+      throw new NotFoundException(
+        'No hay orden activa en la mesa especificada',
+      );
     }
 
-    return this.mapToResponse(order);
+    return {
+      success: true,
+      message: 'Orden activa encontrada',
+      data: this.mapToResponse(order),
+    };
   }
 
-  /**
-   * Obtener órdenes activas del usuario/mesero
-   */
   async findMyOrders(userId: string) {
-    const orders = await this.prisma.orders.findMany({
-      where: {
-        user_id: userId,
-        status: {
-          in: ['ABIERTA', 'CERRADA'],
-        },
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const orders = await this.prisma.orders.findMany({
+        where: {
+          user_id: userId,
+          status: {
+            in: ['ABIERTA', 'CERRADA'],
           },
         },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
-              select: {
-                name: true,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          table: {
+            select: {
+              number: true,
+              name: true,
+              floor: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            order_items: true,
+          _count: {
+            select: {
+              order_items: true,
+            },
           },
         },
-      },
-      orderBy: { created_at: 'desc' },
-    });
+        orderBy: { created_at: 'desc' },
+      });
 
-    return orders.map((order) => this.mapToListItem(order));
+      return {
+        success: true,
+        message: 'Órdenes del mesero obtenidas',
+        data: orders.map((order) => this.mapToListItem(order)),
+      };
+    } catch (error) {
+      this.logger.error(
+        'Error interno al obtener las órdenes del mesero',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener las órdenes del mesero',
+      );
+    }
   }
 
-  /**
-   * Obtener detalle de una orden
-   */
   async findOne(id: string) {
     const order = await this.prisma.orders.findUnique({
       where: { id },
@@ -287,10 +302,14 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Orden con ID "${id}" no encontrada`);
+      throw new NotFoundException('Orden no encontrada');
     }
 
-    return this.mapToResponse(order);
+    return {
+      success: true,
+      message: 'Detalle de la orden obtenido exitosamente',
+      data: this.mapToResponse(order),
+    };
   }
 
   /**
@@ -535,9 +554,6 @@ export class OrdersService {
     return this.mapToResponse(cancelledOrder);
   }
 
-  /**
-   * Obtener historial
-   */
   async getHistory(filters: OrderHistoryDto) {
     const where: ordersWhereInput = {};
 
@@ -563,36 +579,50 @@ export class OrdersService {
       where.table_id = filters.table_id;
     }
 
-    const orders = await this.prisma.orders.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const orders = await this.prisma.orders.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
           },
-        },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
-              select: {
-                name: true,
+          table: {
+            select: {
+              number: true,
+              name: true,
+              floor: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            order_items: true,
+          _count: {
+            select: {
+              order_items: true,
+            },
           },
         },
-      },
-      orderBy: { created_at: 'desc' },
-      take: 100,
-    });
+        orderBy: { created_at: 'desc' },
+        take: 100,
+      });
 
-    return orders.map((order) => this.mapToListItem(order));
+      return {
+        success: true,
+        message: 'Historial de órdenes obtenido exitosamente',
+        data: orders.map((order) => this.mapToListItem(order)),
+      };
+    } catch (error) {
+      this.logger.error(
+        'Error interno al obtener el historial de órdenes',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener el historial de órdenes',
+      );
+    }
   }
 
   /**

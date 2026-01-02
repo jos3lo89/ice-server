@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -22,21 +23,19 @@ import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
 
 @Injectable()
 export class OrderItemsService {
+  private readonly logger = new Logger(OrderItemsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly ordersService: OrdersService,
     private readonly printersService: PrintersService,
   ) {}
 
-  /**
-   * Agregar item a la orden
-   */
   async addItem(
     orderId: string,
     userId: string,
     createOrderItemDto: CreateOrderItemDto,
   ) {
-    // Verificar que la orden existe y está abierta
     const order = await this.prisma.orders.findUnique({
       where: { id: orderId },
       select: { status: true },
@@ -52,7 +51,6 @@ export class OrderItemsService {
       );
     }
 
-    // Verificar que el producto existe y está disponible
     const product = await this.prisma.products.findUnique({
       where: { id: createOrderItemDto.product_id },
       include: {
@@ -73,19 +71,17 @@ export class OrderItemsService {
       );
     }
 
-    // Validar variantes requeridas
     if (product.variant_groups.length > 0) {
       if (
         !createOrderItemDto.variants ||
         createOrderItemDto.variants.length === 0
       ) {
         throw new BadRequestException(
-          `El producto "${product.name}" requiere seleccionar variantes`,
+          `El producto ${product.name} requiere seleccionar variantes`,
         );
       }
     }
 
-    // Calcular totales
     const variantsTotal = createOrderItemDto.variants
       ? createOrderItemDto.variants.reduce(
           (sum, v) => sum + v.price_modifier,
@@ -94,9 +90,9 @@ export class OrderItemsService {
       : 0;
 
     const unitPrice = Number(product.price);
+    // TODO: ver en mismos porductos ingresados de menra diferente
     const lineTotal = (unitPrice + variantsTotal) * createOrderItemDto.quantity;
 
-    // Crear item
     const orderItem = await this.prisma.order_items.create({
       data: {
         order_id: orderId,
@@ -115,16 +111,16 @@ export class OrderItemsService {
       },
     });
 
-    // Recalcular total de la orden
     await this.ordersService.recalculateTotal(orderId);
 
-    // Obtener nuevo subtotal
     const updatedOrder = await this.prisma.orders.findUnique({
       where: { id: orderId },
       select: { subtotal: true },
     });
 
     return {
+      success: true,
+      message: 'Item agregado exitosamente',
       data: {
         id: orderItem.id,
         product_name: orderItem.product_name,
