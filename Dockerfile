@@ -39,6 +39,6 @@ COPY --from=build /app/package*.json ./
 
 RUN npm install -g tsx
 
-EXPOSE 3000
+EXPOSE 5000
 
 CMD ["node", "dist/src/main.js"]
