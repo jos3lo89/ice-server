@@ -33,10 +33,12 @@ async function main() {
     { key: 'CURRENCY_SYMBOL', value: 'S/', description: 'Símbolo de moneda' },
   ];
 
-  await prisma.system_config.createMany({
+  const newConfigs = await prisma.system_config.createMany({
     data: configs,
     skipDuplicates: true,
   });
+
+  console.log('new configs: ', newConfigs);
 
   // 2. pisos
   const floor1 = await prisma.floors.upsert({
@@ -69,11 +71,13 @@ async function main() {
     },
   });
 
+  console.log('new floors: ', [floor1, floor2, floor3]);
+
   // 3. usuario administrador (password: admin123)
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash('admin123', salt);
 
-  await prisma.users.upsert({
+  const newAdmin = await prisma.users.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
@@ -94,7 +98,7 @@ async function main() {
   });
 
   const passwordHashMesero = await bcrypt.hash('mesero123', salt);
-  await prisma.users.upsert({
+  const newMesero = await prisma.users.upsert({
     where: { username: 'mesero' },
     update: {},
     create: {
@@ -114,8 +118,10 @@ async function main() {
     },
   });
 
+  console.log('new users: ', [newAdmin, newMesero]);
+
   // 4. cliente generico
-  await prisma.clients.upsert({
+  const newClient = await prisma.clients.upsert({
     where: {
       tipo_documento_numero_documento: {
         tipo_documento: 'SIN_DOC',
@@ -129,6 +135,8 @@ async function main() {
       razon_social: 'CLIENTE VARIOS',
     },
   });
+
+  console.log('new clients: ', [newClient]);
 
   // 5. categorias y subcategorias
   const catEntradas = await prisma.categories.create({
@@ -162,13 +170,15 @@ async function main() {
     },
   });
 
+  console.log('new categories: ', [catEntradas, catFondos]);
+
   // 6. productos
   const subCarne = await prisma.categories.findFirst({
     where: { slug: 'carnes' },
   });
 
   if (subCarne) {
-    await prisma.products.create({
+    const newProduct = await prisma.products.create({
       data: {
         category_id: subCarne.id,
         name: 'Lomo Saltado',
@@ -190,6 +200,8 @@ async function main() {
         },
       },
     });
+
+    console.log('new product: ', [newProduct]);
   }
 
   // 7. mesas (piso 1: 101-105, piso 2: 201-205, piso 3: 301-305)
@@ -198,7 +210,7 @@ async function main() {
   for (const f of floors) {
     for (let i = 1; i <= 10; i++) {
       const tableNum = f.level * 100 + i;
-      await prisma.tables.upsert({
+      const newTable = await prisma.tables.upsert({
         where: { floor_id_number: { floor_id: f.id, number: tableNum } },
         update: {},
         create: {
@@ -208,6 +220,8 @@ async function main() {
           status: table_status.LIBRE,
         },
       });
+
+      console.log(`Table: ${newTable.name}`);
     }
   }
 
