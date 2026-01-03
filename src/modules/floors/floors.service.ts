@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -10,6 +11,8 @@ import { UpdateFloorDto } from './dto/update-floor.dto';
 
 @Injectable()
 export class FloorsService {
+  private readonly logger = new Logger(FloorsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(values: CreateFloorDto) {
@@ -36,6 +39,7 @@ export class FloorsService {
 
   async findAll() {
     return await this.prisma.floors.findMany({
+      where: { is_active: true },
       include: {
         _count: {
           select: { tables: true },
@@ -98,6 +102,73 @@ export class FloorsService {
       });
     } catch (error) {
       throw new InternalServerErrorException('Nose pudo desactivar piso');
+    }
+  }
+
+  async findAllWithTables() {
+    try {
+      const floors = await this.prisma.floors.findMany({
+        where: { is_active: true },
+        select: {
+          id: true,
+          level: true,
+          name: true,
+          _count: {
+            select: { tables: true },
+          },
+          tables: {
+            where: { is_active: true },
+            orderBy: { number: 'asc' },
+            select: {
+              orders: {
+                select: {
+                  id: true,
+                  daily_number: true,
+                  subtotal: true,
+                  status: true,
+                  created_at: true,
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+              id: true,
+              name: true,
+              number: true,
+              capacity: true,
+              status: true,
+              _count: {
+                select: {
+                  orders: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { level: 'asc' },
+      });
+      return {
+        success: true,
+        message: 'Pisos obtenidos correctamente',
+        data: floors.map((f) => ({
+          ...f,
+          tables: f.tables.map((t) => ({
+            ...t,
+            orders: t.orders.map((o) => ({
+              ...o,
+              subtotal: Number(o.subtotal),
+            })),
+          })),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al obtener los pisos con mesas', error.stack);
+      throw new InternalServerErrorException(
+        'Error interno al obtener los pisos con mesas',
+      );
     }
   }
 }

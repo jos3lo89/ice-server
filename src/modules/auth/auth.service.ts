@@ -227,9 +227,8 @@ export class AuthService {
 
       return {
         success: true,
-        data: {
-          message: 'Tu contraseña ha sido actualizada con éxito',
-        },
+        message: 'Tu contraseña ha sido actualizada con éxito',
+        data: null,
       };
     } catch (error) {
       throw new InternalServerErrorException('Error al cambiar al contraseña.');

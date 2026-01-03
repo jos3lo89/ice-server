@@ -99,7 +99,7 @@ export class AuthController {
         await this.authService.refreshTokens(decoded.sub, refreshToken);
 
       this.setCookies(res, accessToken, newRefreshToken);
-      return { success: true, message: 'Token renovado' };
+      return { success: true, message: 'Token renovado', data: null };
     } catch (error) {
       throw new UnauthorizedException('Token de refresco inválido');
     }

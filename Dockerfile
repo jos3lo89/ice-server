@@ -1,7 +1,7 @@
 # ============================================
 # Paso 1: Dependencies
 # ============================================
-FROM node:22-alpine AS dependencies
+FROM node:24.12.0-alpine AS dependencies
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -9,7 +9,7 @@ RUN npm ci
 # ============================================
 # Paso 2: Build
 # ============================================
-FROM node:22-alpine AS build
+FROM node:24.12.0-alpine AS build
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
@@ -23,7 +23,7 @@ RUN npm prune --production
 # ============================================
 # Paso 3: Production
 # ============================================
-FROM node:22-alpine AS production
+FROM node:24.12.0-alpine AS production
 
 # Instalar openssl - requerido por Prisma
 RUN apk add --no-cache openssl
@@ -39,6 +39,6 @@ COPY --from=build /app/package*.json ./
 
 RUN npm install -g tsx
 
-EXPOSE 5000
+EXPOSE 3000
 
 CMD ["node", "dist/src/main.js"]

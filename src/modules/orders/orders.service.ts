@@ -65,34 +65,43 @@ export class OrdersService {
     const dailyNumber = (lastOrder?.daily_number || 0) + 1;
 
     try {
-      const order = await this.prisma.orders.create({
-        data: {
-          daily_number: dailyNumber,
-          order_date: today,
-          user_id: userId,
-          table_id: createOrderDto.table_id,
-          diners_count: createOrderDto.diners_count,
-          notes: createOrderDto.notes,
-          status: order_status.ABIERTA,
-        },
-        include: {
-          user: {
-            select: {
-              name: true,
-            },
+      const order = await this.prisma.$transaction(async (tx) => {
+        const order = await this.prisma.orders.create({
+          data: {
+            daily_number: dailyNumber,
+            order_date: today,
+            user_id: userId,
+            table_id: createOrderDto.table_id,
+            diners_count: createOrderDto.diners_count,
+            notes: createOrderDto.notes,
+            status: order_status.ABIERTA,
           },
-          table: {
-            select: {
-              number: true,
-              name: true,
-              floor: {
-                select: {
-                  name: true,
+          include: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
+            table: {
+              select: {
+                number: true,
+                name: true,
+                floor: {
+                  select: {
+                    name: true,
+                  },
                 },
               },
             },
           },
-        },
+        });
+
+        await this.prisma.tables.update({
+          where: { id: createOrderDto.table_id },
+          data: { status: 'OCUPADA' },
+        });
+
+        return order;
       });
 
       return {

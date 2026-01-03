@@ -33,8 +33,7 @@ export class TablesController {
     description: 'El número de mesa ya existe en ese piso.',
   })
   async create(@Body() createTableDto: CreateTableDto) {
-    const table = await this.tablesService.create(createTableDto);
-    return { success: true, message: 'Mesa creada', data: table };
+    return this.tablesService.create(createTableDto);
   }
 
   @Get()
@@ -47,6 +46,17 @@ export class TablesController {
   findAll() {
     return this.tablesService.findAll();
   }
+
+  // @Get('floor')
+  // @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
+  // @ApiOperation({
+  //   summary: 'Mesas con piso',
+  //   description: 'Obtiene todas las mesas activas con su información de piso.',
+  // })
+  // @ApiResponse({ status: 200, description: 'Mesas obtenidas exitosamente.' })
+  // findAllWithFloor() {
+  //   return this.tablesService.findAllWithFloor();
+  // }
 
   @Get('floor/:floorId')
   @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)

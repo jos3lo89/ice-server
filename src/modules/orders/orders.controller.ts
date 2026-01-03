@@ -241,7 +241,7 @@ export class OrdersController {
   }
 
   @Patch(':id/cancel')
-  @Auth(Role.ADMIN, Role.CAJERO)
+  @Auth(Role.ADMIN, Role.CAJERO, Role.MESERO)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Cancelar orden completa',

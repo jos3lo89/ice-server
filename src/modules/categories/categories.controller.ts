@@ -172,12 +172,6 @@ export class CategoriesController {
   @ApiResponse({
     status: 200,
     description: 'Categoría desactivada',
-    schema: {
-      example: {
-        success: true,
-        data: { message: 'Categoría "Postres" desactivada exitosamente' },
-      },
-    },
   })
   @ApiResponse({
     status: 400,
