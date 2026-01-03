@@ -313,7 +313,7 @@ model tables {
   floor_id   String       @db.Uuid
   number     Int
   name       String?      @db.VarChar(50)
-  capacity   Int          @default(4)
+  capacity   Int          @default(10)
   status     table_status @default(LIBRE)
   pos_x      Int          @default(0)
   pos_y      Int          @default(0)
