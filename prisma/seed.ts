@@ -7,7 +7,7 @@ import {
   tipo_documento_identidad,
   user_role,
 } from '../src/generated/prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 config();
 
