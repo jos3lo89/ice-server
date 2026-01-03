@@ -10,7 +10,11 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:5173'],
+    origin: [
+      'http://localhost:5173',
+      'https://lagarto.site',
+      'https://ice-mankora.vercel.app',
+    ],
     credentials: true,
   });
 
