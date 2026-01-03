@@ -6,7 +6,7 @@ import {
   table_status,
   tipo_documento_identidad,
   user_role,
-} from 'src/generated/prisma/client';
+} from '../src/generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 
 config();
