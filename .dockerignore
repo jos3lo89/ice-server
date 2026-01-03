@@ -3,11 +3,6 @@ dist
 build
 out
 
-/src/generated
-/generated/prisma
-*.db
-*.db-journal
-
 .env
 .env.*
 !.env.example
