@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -17,6 +18,8 @@ import { Role } from 'src/common/enums/role.enum';
 import { CashRegisterHistoryDto } from './dto/cash-register-history.dto';
 import { CloseCashRegisterDto } from './dto/close-cash-register.dto';
 import { OpenCashRegisterDto } from './dto/open-cash-register.dto';
+import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
+import { RequireCashRegister } from 'src/common/decorators/requireCashRegister.decorator';
 
 @ApiTags('Gestión de cajas registradoras')
 @Controller('cash-registers')
@@ -24,6 +27,7 @@ export class CashRegistersController {
   constructor(private readonly cashRegistersService: CashRegistersService) {}
 
   @Post('open')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Abrir caja',
@@ -39,13 +43,15 @@ export class CashRegistersController {
   @ApiResponse({ status: 403, description: 'Sin permisos' })
   @ApiResponse({ status: 409, description: 'Ya tiene una caja abierta' })
   async open(
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() openCashRegisterDto: OpenCashRegisterDto,
   ) {
-    return this.cashRegistersService.open(userId, openCashRegisterDto);
+    return this.cashRegistersService.open(user.sub, openCashRegisterDto);
   }
 
   @Post('close')
+  @RequireCashRegister()
+  @Auth(Role.ADMIN, Role.CAJERO)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Cerrar caja',
@@ -58,13 +64,15 @@ export class CashRegistersController {
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 404, description: 'No tiene caja abierta' })
   async close(
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() closeCashRegisterDto: CloseCashRegisterDto,
   ) {
-    return this.cashRegistersService.close(userId, closeCashRegisterDto);
+    return this.cashRegistersService.close(user.sub, closeCashRegisterDto);
   }
 
   @Get('current')
+  @RequireCashRegister()
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Obtener caja actual',
     description:
@@ -75,24 +83,28 @@ export class CashRegistersController {
     description: 'Caja actual del usuario',
     schema: {
       example: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        open_time: '2024-01-15T08:00:00Z',
-        initial_amount: 500.0,
-        status: 'ABIERTA',
-        hours_open: 4.5,
-        totals: {
-          sales: 1250.0,
-          income: 50.0,
-          expense: 50.0,
-          current_balance: 1750.0,
+        succes: true,
+        message: 'Caja actual obtenida exitosamente',
+        data: {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          open_time: '2024-01-15T08:00:00Z',
+          initial_amount: 500.0,
+          status: 'ABIERTA',
+          hours_open: 4.5,
+          totals: {
+            sales: 1250.0,
+            income: 50.0,
+            expense: 50.0,
+            current_balance: 1750.0,
+          },
+          sales_count: 15,
+          last_sale: '2024-01-15T12:25:00Z',
         },
-        sales_count: 15,
-        last_sale: '2024-01-15T12:25:00Z',
       },
     },
   })
-  async getCurrent(@CurrentUser('id') userId: string) {
-    return this.cashRegistersService.getCurrent(userId);
+  async getCurrent(@CurrentUser() user: CurrentUserI) {
+    return this.cashRegistersService.getCurrent(user.sub);
   }
 
   @Get('today')
@@ -103,12 +115,13 @@ export class CashRegistersController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de cajas del día',
+    description: 'Cajas del día obtenidas exitosamente',
   })
   async getToday() {
     return this.cashRegistersService.getToday();
   }
 
+  // TODO: ver fechas en peru hay variaciones creo wadafa dx
   @Get('history')
   @Auth(Role.ADMIN)
   @ApiOperation({
@@ -125,6 +138,7 @@ export class CashRegistersController {
   }
 
   @Get(':id')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Obtener caja por ID',
     description: 'Obtiene el detalle de una caja específica. ADMIN y CAJERO.',
@@ -132,19 +146,31 @@ export class CashRegistersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la caja',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Detalle de la caja',
+    description: 'Caja obtenida exitosamente',
   })
-  @ApiResponse({ status: 400, description: 'UUID inválido' })
+  @ApiResponse({ status: 400, description: 'ID inválido' })
   @ApiResponse({ status: 404, description: 'Caja no encontrada' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+  async findOne(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID de la caja no es válido');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.cashRegistersService.findOne(id);
   }
 
   @Get(':id/summary')
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Resumen de caja',
     description:
@@ -153,15 +179,26 @@ export class CashRegistersController {
   @ApiParam({
     name: 'id',
     description: 'UUID de la caja',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
     description: 'Resumen completo de la caja',
   })
-  @ApiResponse({ status: 400, description: 'UUID inválido' })
+  @ApiResponse({ status: 400, description: 'Id inválido' })
   @ApiResponse({ status: 404, description: 'Caja no encontrada' })
-  async getSummary(@Param('id', ParseUUIDPipe) id: string) {
+  async getSummary(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID de la caja no es válido');
+        },
+      }),
+    )
+    id: string,
+  ) {
     return this.cashRegistersService.getSummary(id);
   }
 }

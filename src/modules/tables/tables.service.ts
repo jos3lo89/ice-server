@@ -51,8 +51,9 @@ export class TablesService {
     try {
       const tables = await this.prisma.tables.findMany({
         where: { is_active: true },
-        include: { floor: { select: { name: true } } },
+        include: { floor: { select: { name: true, id: true, level: true } } },
       });
+
       return {
         success: true,
         message: 'Mesas obtenidas exitosamente.',
@@ -83,7 +84,6 @@ export class TablesService {
         where: { floor_id: piso.id, is_active: true },
         include: {
           orders: {
-            where: { status: 'ABIERTA' },
             select: { id: true, daily_number: true, subtotal: true },
           },
         },
@@ -186,4 +186,8 @@ export class TablesService {
       );
     }
   }
+
+  // async findAllWithFloor() {
+  //   const tables = await this.prisma.ta
+  // }
 }

@@ -46,6 +46,17 @@ export class FloorsController {
     return { success: true, data: floors };
   }
 
+  @Get('tables')
+  @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
+  @ApiOperation({
+    summary: 'Listar todos los pisos con sus mesas',
+    description: 'Obtiene una lista de los pisos incluyendo sus mesas.',
+  })
+  @ApiResponse({ status: 200, description: 'Lista obtenida correctamente.' })
+  async findAllWithTables() {
+    return this.floorsService.findAllWithTables();
+  }
+
   @Get(':id')
   @Auth(Role.ADMIN, Role.BARTENDER, Role.CAJERO, Role.COCINERO, Role.MESERO)
   @ApiOperation({

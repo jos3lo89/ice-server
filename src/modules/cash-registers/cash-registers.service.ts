@@ -1,6 +1,8 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -12,13 +14,11 @@ import { CashRegisterTotalsDto } from './dto/cash-register-response.dto';
 
 @Injectable()
 export class CashRegistersService {
+  private readonly logger = new Logger(CashRegistersService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Abrir caja
-   */
   async open(userId: string, openCashRegisterDto: OpenCashRegisterDto) {
-    // Validar que el usuario no tenga otra caja abierta
     const existingOpenCash = await this.prisma.cash_registers.findFirst({
       where: {
         user_id: userId,
@@ -30,54 +30,58 @@ export class CashRegistersService {
       throw new ConflictException('Ya tiene una caja abierta');
     }
 
-    // Crear nueva caja
-    const cashRegister = await this.prisma.cash_registers.create({
-      data: {
-        user_id: userId,
-        initial_amount: openCashRegisterDto.initial_amount,
-        expected_amount: openCashRegisterDto.initial_amount,
-        notes: openCashRegisterDto.notes,
-        status: 'ABIERTA',
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
+    try {
+      const cashRegister = await this.prisma.cash_registers.create({
+        data: {
+          user_id: userId,
+          initial_amount: openCashRegisterDto.initial_amount,
+          expected_amount: openCashRegisterDto.initial_amount,
+          notes: openCashRegisterDto.notes,
+          status: 'ABIERTA',
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return {
-      id: cashRegister.id,
-      user: cashRegister.user,
-      open_time: cashRegister.open_time,
-      close_time: cashRegister.close_time,
-      initial_amount: Number(cashRegister.initial_amount),
-      total_sales: Number(cashRegister.total_sales),
-      total_income: Number(cashRegister.total_income),
-      total_expense: Number(cashRegister.total_expense),
-      expected_amount: Number(cashRegister.expected_amount),
-      final_amount: cashRegister.final_amount
-        ? Number(cashRegister.final_amount)
-        : undefined,
-      difference: cashRegister.difference
-        ? Number(cashRegister.difference)
-        : undefined,
-      status: cashRegister.status,
-      notes: cashRegister.notes,
-      created_at: cashRegister.created_at,
-      updated_at: cashRegister.updated_at,
-    };
+      return {
+        succes: true,
+        message: 'Caja abierta exitosamente',
+        data: {
+          id: cashRegister.id,
+          user: cashRegister.user,
+          open_time: cashRegister.open_time,
+          close_time: cashRegister.close_time,
+          initial_amount: Number(cashRegister.initial_amount),
+          total_sales: Number(cashRegister.total_sales),
+          total_income: Number(cashRegister.total_income),
+          total_expense: Number(cashRegister.total_expense),
+          expected_amount: Number(cashRegister.expected_amount),
+          final_amount: cashRegister.final_amount
+            ? Number(cashRegister.final_amount)
+            : undefined,
+          difference: cashRegister.difference
+            ? Number(cashRegister.difference)
+            : undefined,
+          status: cashRegister.status,
+          notes: cashRegister.notes,
+          created_at: cashRegister.created_at,
+          updated_at: cashRegister.updated_at,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Error interno al abrir caja', error);
+      throw new InternalServerErrorException('Error interno al abrir caja');
+    }
   }
 
-  /**
-   * Cerrar caja
-   */
   async close(userId: string, closeCashRegisterDto: CloseCashRegisterDto) {
-    // Buscar caja abierta del usuario
     const cashRegister = await this.prisma.cash_registers.findFirst({
       where: {
         user_id: userId,
@@ -97,31 +101,36 @@ export class CashRegistersService {
       throw new NotFoundException('No tiene una caja abierta');
     }
 
-    // Calcular diferencia
     const difference =
       closeCashRegisterDto.final_amount - Number(cashRegister.expected_amount);
 
-    // Actualizar caja
-    const closedCashRegister = await this.prisma.cash_registers.update({
-      where: { id: cashRegister.id },
-      data: {
-        close_time: new Date(),
-        final_amount: closeCashRegisterDto.final_amount,
-        difference,
-        status: 'CERRADA',
-        notes: closeCashRegisterDto.notes
-          ? `${cashRegister.notes || ''}\n--- CIERRE ---\n${closeCashRegisterDto.notes}`
-          : cashRegister.notes,
-      },
-    });
+    try {
+      const closedCashRegister = await this.prisma.cash_registers.update({
+        where: { id: cashRegister.id },
+        data: {
+          close_time: new Date(),
+          final_amount: closeCashRegisterDto.final_amount,
+          difference,
+          status: 'CERRADA',
+          notes: closeCashRegisterDto.notes
+            ? `${cashRegister.notes || ''}\n--- CIERRE ---\n${closeCashRegisterDto.notes}`
+            : cashRegister.notes,
+        },
+      });
 
-    // Obtener resumen completo
-    return this.getSummary(closedCashRegister.id);
+      const summary = await this.getSummary(closedCashRegister.id);
+
+      return {
+        succes: true,
+        message: 'Caja cerrada exitosamente',
+        data: summary,
+      };
+    } catch (error) {
+      this.logger.error('Error interno al cerrar caja', error);
+      throw new InternalServerErrorException('Error interno al cerrar caja');
+    }
   }
 
-  /**
-   * Obtener caja actual del usuario
-   */
   async getCurrent(userId: string) {
     const cashRegister = await this.prisma.cash_registers.findFirst({
       where: {
@@ -131,94 +140,175 @@ export class CashRegistersService {
     });
 
     if (!cashRegister) {
-      return null;
+      throw new NotFoundException('No tiene una caja abierta');
     }
 
-    // Calcular horas abiertas
     const now = new Date();
     const hoursOpen =
       (now.getTime() - cashRegister.open_time.getTime()) / (1000 * 60 * 60);
 
-    // Obtener última venta
-    const lastSale = await this.prisma.sales.findFirst({
-      where: { cash_register_id: cashRegister.id },
-      orderBy: { created_at: 'desc' },
-      select: { created_at: true },
-    });
+    try {
+      const lastSale = await this.prisma.sales.findFirst({
+        where: { cash_register_id: cashRegister.id },
+        orderBy: { created_at: 'desc' },
+        select: { created_at: true },
+      });
 
-    // Contar ventas
-    const salesCount = await this.prisma.sales.count({
-      where: { cash_register_id: cashRegister.id },
-    });
+      const salesCount = await this.prisma.sales.count({
+        where: { cash_register_id: cashRegister.id },
+      });
 
-    const totals: CashRegisterTotalsDto = {
-      sales: Number(cashRegister.total_sales),
-      income: Number(cashRegister.total_income),
-      expense: Number(cashRegister.total_expense),
-      current_balance: Number(cashRegister.expected_amount),
-    };
+      const totals: CashRegisterTotalsDto = {
+        sales: Number(cashRegister.total_sales),
+        income: Number(cashRegister.total_income),
+        expense: Number(cashRegister.total_expense),
+        current_balance: Number(cashRegister.expected_amount),
+      };
 
-    return {
-      id: cashRegister.id,
-      open_time: cashRegister.open_time,
-      initial_amount: Number(cashRegister.initial_amount),
-      status: cashRegister.status,
-      hours_open: Number(hoursOpen.toFixed(2)),
-      totals,
-      sales_count: salesCount,
-      last_sale: lastSale?.created_at,
-    };
+      return {
+        success: true,
+        message: 'Caja actual obtenida exitosamente',
+        data: {
+          id: cashRegister.id,
+          open_time: cashRegister.open_time,
+          initial_amount: Number(cashRegister.initial_amount),
+          status: cashRegister.status,
+          hours_open: Number(hoursOpen.toFixed(2)),
+          totals,
+          sales_count: salesCount,
+          last_sale: lastSale?.created_at,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Error interno al obtener caja actual', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener caja actual',
+      );
+    }
   }
 
-  /**
-   * Obtener todas las cajas del día
-   */
   async getToday() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const cashRegisters = await this.prisma.cash_registers.findMany({
-      where: {
-        open_time: {
-          gte: today,
-          lt: tomorrow,
-        },
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const cashRegisters = await this.prisma.cash_registers.findMany({
+        where: {
+          open_time: {
+            gte: today,
+            lt: tomorrow,
           },
         },
-        _count: {
-          select: {
-            sales: true,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              sales: true,
+            },
           },
         },
-      },
-      orderBy: { open_time: 'desc' },
-    });
+        orderBy: { open_time: 'desc' },
+      });
 
-    return cashRegisters.map((cr) => ({
-      id: cr.id,
-      user_name: cr.user.name,
-      open_time: cr.open_time,
-      close_time: cr.close_time,
-      initial_amount: Number(cr.initial_amount),
-      expected_amount: Number(cr.expected_amount),
-      final_amount: cr.final_amount ? Number(cr.final_amount) : undefined,
-      difference: cr.difference ? Number(cr.difference) : undefined,
-      status: cr.status,
-      sales_count: cr._count.sales,
-      total_sales: Number(cr.total_sales),
-    }));
+      return {
+        success: true,
+        message: 'Cajas del día obtenidas exitosamente',
+        data: cashRegisters.map((cr) => ({
+          id: cr.id,
+          user_name: cr.user.name,
+          open_time: cr.open_time,
+          close_time: cr.close_time,
+          initial_amount: Number(cr.initial_amount),
+          expected_amount: Number(cr.expected_amount),
+          final_amount: cr.final_amount ? Number(cr.final_amount) : undefined,
+          difference: cr.difference ? Number(cr.difference) : undefined,
+          status: cr.status,
+          sales_count: cr._count.sales,
+          total_sales: Number(cr.total_sales),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error interno al obtener cajas del día', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener cajas del día',
+      );
+    }
   }
 
-  /**
-   * Obtener detalle de caja por ID
-   */
+  async getHistory(filters: CashRegisterHistoryDto) {
+    const where: cash_registersWhereInput = {};
+
+    // filtrara por rango de fechas
+    if (filters.from || filters.to) {
+      where.open_time = {};
+      if (filters.from) {
+        where.open_time.gte = new Date(filters.from);
+      }
+      if (filters.to) {
+        const toDate = new Date(filters.to);
+        toDate.setHours(23, 59, 59, 999);
+        where.open_time.lte = toDate;
+      }
+    }
+
+    // filtrar por usuario
+    if (filters.user_id) {
+      where.user_id = filters.user_id;
+    }
+
+    // filtrar por estadoj
+    if (filters.status) {
+      where.status = filters.status;
+    }
+    try {
+      const cashRegisters = await this.prisma.cash_registers.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              sales: true,
+            },
+          },
+        },
+        orderBy: { open_time: 'desc' },
+        take: 100,
+      });
+
+      return {
+        success: true,
+        message: 'Historial de cajas obtenido exitosamente',
+        data: cashRegisters.map((cr) => ({
+          id: cr.id,
+          user_name: cr.user.name,
+          open_time: cr.open_time,
+          close_time: cr.close_time,
+          initial_amount: Number(cr.initial_amount),
+          expected_amount: Number(cr.expected_amount),
+          final_amount: cr.final_amount ? Number(cr.final_amount) : undefined,
+          difference: cr.difference ? Number(cr.difference) : undefined,
+          status: cr.status,
+          sales_count: cr._count.sales,
+          total_sales: Number(cr.total_sales),
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error interno al obtener historial de cajas', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener historial de cajas',
+      );
+    }
+  }
+
   async findOne(id: string) {
     const cashRegister = await this.prisma.cash_registers.findUnique({
       where: { id },
@@ -234,35 +324,37 @@ export class CashRegistersService {
     });
 
     if (!cashRegister) {
-      throw new NotFoundException(`Caja con ID "${id}" no encontrada`);
+      this.logger.warn(`Caja con ID ${id} no encontrada`);
+      throw new NotFoundException('Caja no encontrada');
     }
 
     return {
-      id: cashRegister.id,
-      user: cashRegister.user,
-      open_time: cashRegister.open_time,
-      close_time: cashRegister.close_time,
-      initial_amount: Number(cashRegister.initial_amount),
-      total_sales: Number(cashRegister.total_sales),
-      total_income: Number(cashRegister.total_income),
-      total_expense: Number(cashRegister.total_expense),
-      expected_amount: Number(cashRegister.expected_amount),
-      final_amount: cashRegister.final_amount
-        ? Number(cashRegister.final_amount)
-        : undefined,
-      difference: cashRegister.difference
-        ? Number(cashRegister.difference)
-        : undefined,
-      status: cashRegister.status,
-      notes: cashRegister.notes,
-      created_at: cashRegister.created_at,
-      updated_at: cashRegister.updated_at,
+      success: true,
+      message: 'Caja obtenida exitosamente',
+      data: {
+        id: cashRegister.id,
+        user: cashRegister.user,
+        open_time: cashRegister.open_time,
+        close_time: cashRegister.close_time,
+        initial_amount: Number(cashRegister.initial_amount),
+        total_sales: Number(cashRegister.total_sales),
+        total_income: Number(cashRegister.total_income),
+        total_expense: Number(cashRegister.total_expense),
+        expected_amount: Number(cashRegister.expected_amount),
+        final_amount: cashRegister.final_amount
+          ? Number(cashRegister.final_amount)
+          : undefined,
+        difference: cashRegister.difference
+          ? Number(cashRegister.difference)
+          : undefined,
+        status: cashRegister.status,
+        notes: cashRegister.notes,
+        created_at: cashRegister.created_at,
+        updated_at: cashRegister.updated_at,
+      },
     };
   }
 
-  /**
-   * Obtener resumen completo de una caja
-   */
   async getSummary(id: string) {
     const cashRegister = await this.prisma.cash_registers.findUnique({
       where: { id },
@@ -274,10 +366,9 @@ export class CashRegistersService {
     });
 
     if (!cashRegister) {
-      throw new NotFoundException(`Caja con ID "${id}" no encontrada`);
+      throw new NotFoundException('Caja no encontrada');
     }
 
-    // Calcular duración
     const closeTime = cashRegister.close_time || new Date();
     const durationHours =
       (closeTime.getTime() - cashRegister.open_time.getTime()) /
@@ -346,102 +437,46 @@ export class CashRegistersService {
     });
 
     return {
-      id: cashRegister.id,
-      user: cashRegister.user.name,
-      period: {
-        open: cashRegister.open_time,
-        close: cashRegister.close_time,
-        duration_hours: Number(durationHours.toFixed(2)),
-      },
-      amounts: {
-        initial: Number(cashRegister.initial_amount),
-        expected: Number(cashRegister.expected_amount),
-        final: cashRegister.final_amount
-          ? Number(cashRegister.final_amount)
-          : undefined,
-        difference: cashRegister.difference
-          ? Number(cashRegister.difference)
-          : undefined,
-      },
-      sales_summary: {
-        total_count: totalSalesCount,
-        total_amount: Number(cashRegister.total_sales),
-        by_type: salesByTypeMap,
-        by_payment_method: salesByPaymentMethodMap,
-      },
-      movements: {
-        income: {
-          count: incomeMovements._count.id,
-          amount: Number(incomeMovements._sum.amount || 0),
+      success: true,
+      message: 'Resumen de caja obtenido exitosamente',
+      data: {
+        id: cashRegister.id,
+        user: {
+          name: cashRegister.user.name,
         },
-        expense: {
-          count: expenseMovements._count.id,
-          amount: Number(expenseMovements._sum.amount || 0),
+        period: {
+          open: cashRegister.open_time,
+          close: cashRegister.close_time,
+          duration_hours: Number(durationHours.toFixed(2)),
+        },
+        amounts: {
+          initial: Number(cashRegister.initial_amount),
+          expected: Number(cashRegister.expected_amount),
+          final: cashRegister.final_amount
+            ? Number(cashRegister.final_amount)
+            : undefined,
+          difference: cashRegister.difference
+            ? Number(cashRegister.difference)
+            : undefined,
+        },
+        sales_summary: {
+          total_count: totalSalesCount,
+          total_amount: Number(cashRegister.total_sales),
+          by_type: salesByTypeMap,
+          by_payment_method: salesByPaymentMethodMap,
+        },
+        movements: {
+          income: {
+            count: incomeMovements._count.id,
+            amount: Number(incomeMovements._sum.amount || 0),
+          },
+          expense: {
+            count: expenseMovements._count.id,
+            amount: Number(expenseMovements._sum.amount || 0),
+          },
         },
       },
     };
-  }
-
-  /**
-   * Obtener historial de cajas
-   */
-  async getHistory(filters: CashRegisterHistoryDto) {
-    const where: cash_registersWhereInput = {};
-
-    // Filtrar por rango de fechas
-    if (filters.from || filters.to) {
-      where.open_time = {};
-      if (filters.from) {
-        where.open_time.gte = new Date(filters.from);
-      }
-      if (filters.to) {
-        const toDate = new Date(filters.to);
-        toDate.setHours(23, 59, 59, 999);
-        where.open_time.lte = toDate;
-      }
-    }
-
-    // Filtrar por usuario
-    if (filters.user_id) {
-      where.user_id = filters.user_id;
-    }
-
-    // Filtrar por estado
-    if (filters.status) {
-      where.status = filters.status;
-    }
-
-    const cashRegisters = await this.prisma.cash_registers.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            sales: true,
-          },
-        },
-      },
-      orderBy: { open_time: 'desc' },
-      take: 100, // Limitar resultados
-    });
-
-    return cashRegisters.map((cr) => ({
-      id: cr.id,
-      user_name: cr.user.name,
-      open_time: cr.open_time,
-      close_time: cr.close_time,
-      initial_amount: Number(cr.initial_amount),
-      expected_amount: Number(cr.expected_amount),
-      final_amount: cr.final_amount ? Number(cr.final_amount) : undefined,
-      difference: cr.difference ? Number(cr.difference) : undefined,
-      status: cr.status,
-      sales_count: cr._count.sales,
-      total_sales: Number(cr.total_sales),
-    }));
   }
 
   /**
@@ -504,32 +539,40 @@ export class CashRegistersService {
     });
   }
 
-  /**
-   * Verificar si el usuario tiene caja abierta
-   */
-  async hasOpenCashRegister(userId: string): Promise<boolean> {
-    const count = await this.prisma.cash_registers.count({
-      where: {
-        user_id: userId,
-        status: 'ABIERTA',
-      },
-    });
+  async hasOpenCashRegister(userId: string) {
+    try {
+      const count = await this.prisma.cash_registers.count({
+        where: {
+          user_id: userId,
+          status: 'ABIERTA',
+        },
+      });
 
-    return count > 0;
+      return count > 0;
+    } catch (error) {
+      this.logger.error('Error interno al verificar caja abierta', error);
+      throw new InternalServerErrorException(
+        'Error interno al verificar caja abierta',
+      );
+    }
   }
 
-  /**
-   * Obtener ID de caja abierta del usuario
-   */
-  async getOpenCashRegisterId(userId: string): Promise<string | null> {
-    const cashRegister = await this.prisma.cash_registers.findFirst({
-      where: {
-        user_id: userId,
-        status: 'ABIERTA',
-      },
-      select: { id: true },
-    });
+  async getOpenCashRegisterId(userId: string) {
+    try {
+      const cashRegister = await this.prisma.cash_registers.findFirst({
+        where: {
+          user_id: userId,
+          status: 'ABIERTA',
+        },
+        select: { id: true },
+      });
 
-    return cashRegister?.id || null;
+      return cashRegister?.id || null;
+    } catch (error) {
+      this.logger.error('Error interno al obtener ID de caja abierta', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener ID de caja abierta',
+      );
+    }
   }
 }

@@ -2,6 +2,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsNotEmpty,
   Min,
   MaxLength,
 } from 'class-validator';
@@ -13,8 +14,17 @@ export class OpenCashRegisterDto {
     example: 500.0,
     minimum: 0,
   })
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0)
+  @IsNotEmpty({
+    message: 'El monto inicial es obligatorio para abrir la caja.',
+  })
+  @IsNumber(
+    { maxDecimalPlaces: 2 },
+    {
+      message:
+        'El monto inicial debe ser un número con un máximo de 2 decimales.',
+    },
+  )
+  @Min(0, { message: 'El monto inicial no puede ser un valor negativo.' })
   initial_amount: number;
 
   @ApiPropertyOptional({
@@ -23,7 +33,9 @@ export class OpenCashRegisterDto {
     maxLength: 1000,
   })
   @IsOptional()
-  @IsString()
-  @MaxLength(1000)
+  @IsString({ message: 'Las notas deben ser una cadena de texto.' })
+  @MaxLength(1000, {
+    message: 'Las notas no pueden exceder los 1000 caracteres.',
+  })
   notes?: string;
 }

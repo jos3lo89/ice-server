@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -15,13 +17,10 @@ import { ordersWhereInput } from 'src/generated/prisma/models';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Crear una nueva orden
-   */
   async create(userId: string, createOrderDto: CreateOrderDto) {
-    // Verificar si la mesa existe
     const table = await this.prisma.tables.findUnique({
       where: { id: createOrderDto.table_id },
       include: {
@@ -34,12 +33,9 @@ export class OrdersService {
     });
 
     if (!table) {
-      throw new NotFoundException(
-        `Mesa con ID "${createOrderDto.table_id}" no encontrada`,
-      );
+      throw new NotFoundException('Mesa no encontrada');
     }
 
-    // Verificar si hay una orden activa para la mesa
     const activeOrder = await this.prisma.orders.findFirst({
       where: {
         table_id: createOrderDto.table_id,
@@ -55,7 +51,6 @@ export class OrdersService {
       );
     }
 
-    // Obtener el último número del día
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -69,50 +64,67 @@ export class OrdersService {
 
     const dailyNumber = (lastOrder?.daily_number || 0) + 1;
 
-    // Crear orden
-    const order = await this.prisma.orders.create({
-      data: {
-        daily_number: dailyNumber,
-        order_date: today,
-        user_id: userId,
-        table_id: createOrderDto.table_id,
-        diners_count: createOrderDto.diners_count,
-        notes: createOrderDto.notes,
-        status: order_status.ABIERTA,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const order = await this.prisma.$transaction(async (tx) => {
+        const order = await this.prisma.orders.create({
+          data: {
+            daily_number: dailyNumber,
+            order_date: today,
+            user_id: userId,
+            table_id: createOrderDto.table_id,
+            diners_count: createOrderDto.diners_count,
+            notes: createOrderDto.notes,
+            status: order_status.ABIERTA,
           },
-        },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
+          include: {
+            user: {
               select: {
                 name: true,
               },
             },
+            table: {
+              select: {
+                number: true,
+                name: true,
+                floor: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
           },
-        },
-      },
-    });
+        });
 
-    return {
-      id: order.id,
-      daily_number: order.daily_number,
-      order_date: order.order_date.toISOString().split('T')[0],
-      table_number: order.table.number,
-      table_name: order.table.name,
-      floor_name: order.table.floor.name,
-      diners_count: order.diners_count,
-      user: order.user.name,
-      status: order.status,
-      created_at: order.created_at,
-      message: `Orden #${order.daily_number} creada exitosamente para Mesa ${order.table.number} (${order.table.floor.name})`,
-    };
+        await this.prisma.tables.update({
+          where: { id: createOrderDto.table_id },
+          data: { status: 'OCUPADA' },
+        });
+
+        return order;
+      });
+
+      return {
+        success: true,
+        message: `Orden #${order.daily_number} creada para la mesa #${order.table.number} (${order.table.floor.name})`,
+        data: {
+          id: order.id,
+          daily_number: order.daily_number,
+          order_date: order.order_date.toISOString().split('T')[0],
+          table_number: order.table.number,
+          table_name: order.table.name,
+          floor_name: order.table.floor.name,
+          diners_count: order.diners_count,
+          user: order.user.name,
+          status: order.status,
+          created_at: order.created_at,
+          message: `Orden #${order.daily_number} creada exitosamente para Mesa ${order.table.number} (${order.table.floor.name})`,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Error interno al crear la orden', error);
+      throw new BadRequestException('Error interno al crear la orden');
+    }
   }
 
   /**
@@ -199,55 +211,69 @@ export class OrdersService {
     });
 
     if (!order) {
-      return null;
+      throw new NotFoundException(
+        'No hay orden activa en la mesa especificada',
+      );
     }
 
-    return this.mapToResponse(order);
+    return {
+      success: true,
+      message: 'Orden activa encontrada',
+      data: this.mapToResponse(order),
+    };
   }
 
-  /**
-   * Obtener órdenes activas del usuario/mesero
-   */
   async findMyOrders(userId: string) {
-    const orders = await this.prisma.orders.findMany({
-      where: {
-        user_id: userId,
-        status: {
-          in: ['ABIERTA', 'CERRADA'],
-        },
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const orders = await this.prisma.orders.findMany({
+        where: {
+          user_id: userId,
+          status: {
+            in: ['ABIERTA', 'CERRADA'],
           },
         },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
-              select: {
-                name: true,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          table: {
+            select: {
+              number: true,
+              name: true,
+              floor: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            order_items: true,
+          _count: {
+            select: {
+              order_items: true,
+            },
           },
         },
-      },
-      orderBy: { created_at: 'desc' },
-    });
+        orderBy: { created_at: 'desc' },
+      });
 
-    return orders.map((order) => this.mapToListItem(order));
+      return {
+        success: true,
+        message: 'Órdenes del mesero obtenidas',
+        data: orders.map((order) => this.mapToListItem(order)),
+      };
+    } catch (error) {
+      this.logger.error(
+        'Error interno al obtener las órdenes del mesero',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener las órdenes del mesero',
+      );
+    }
   }
 
-  /**
-   * Obtener detalle de una orden
-   */
   async findOne(id: string) {
     const order = await this.prisma.orders.findUnique({
       where: { id },
@@ -285,10 +311,14 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Orden con ID "${id}" no encontrada`);
+      throw new NotFoundException('Orden no encontrada');
     }
 
-    return this.mapToResponse(order);
+    return {
+      success: true,
+      message: 'Detalle de la orden obtenido exitosamente',
+      data: this.mapToResponse(order),
+    };
   }
 
   /**
@@ -533,9 +563,6 @@ export class OrdersService {
     return this.mapToResponse(cancelledOrder);
   }
 
-  /**
-   * Obtener historial
-   */
   async getHistory(filters: OrderHistoryDto) {
     const where: ordersWhereInput = {};
 
@@ -561,36 +588,50 @@ export class OrdersService {
       where.table_id = filters.table_id;
     }
 
-    const orders = await this.prisma.orders.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            name: true,
+    try {
+      const orders = await this.prisma.orders.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
           },
-        },
-        table: {
-          select: {
-            number: true,
-            name: true,
-            floor: {
-              select: {
-                name: true,
+          table: {
+            select: {
+              number: true,
+              name: true,
+              floor: {
+                select: {
+                  name: true,
+                },
               },
             },
           },
-        },
-        _count: {
-          select: {
-            order_items: true,
+          _count: {
+            select: {
+              order_items: true,
+            },
           },
         },
-      },
-      orderBy: { created_at: 'desc' },
-      take: 100,
-    });
+        orderBy: { created_at: 'desc' },
+        take: 100,
+      });
 
-    return orders.map((order) => this.mapToListItem(order));
+      return {
+        success: true,
+        message: 'Historial de órdenes obtenido exitosamente',
+        data: orders.map((order) => this.mapToListItem(order)),
+      };
+    } catch (error) {
+      this.logger.error(
+        'Error interno al obtener el historial de órdenes',
+        error,
+      );
+      throw new InternalServerErrorException(
+        'Error interno al obtener el historial de órdenes',
+      );
+    }
   }
 
   /**

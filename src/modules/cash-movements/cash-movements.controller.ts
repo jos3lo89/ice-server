@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CashMovementsService } from './cash-movements.service';
 import { ApiOperation, ApiResponse, ApiParam, ApiTags } from '@nestjs/swagger';
@@ -15,6 +17,7 @@ import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { CreateCashMovementDto } from './dto/create-cash-movement.dto';
 import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
+import { RequireCashRegister } from 'src/common/decorators/requireCashRegister.decorator';
 
 @ApiTags('Gestión de movimientos de efectivo')
 @Controller('cash-movements')
@@ -22,8 +25,8 @@ export class CashMovementsController {
   constructor(private readonly cashMovementsService: CashMovementsService) {}
 
   @Post()
+  @RequireCashRegister()
   @Auth(Role.ADMIN, Role.CAJERO)
-  // @RequireCashRegister()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Registrar movimiento de caja',
@@ -41,15 +44,15 @@ export class CashMovementsController {
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 403, description: 'Sin permisos o sin caja abierta' })
   async create(
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() createCashMovementDto: CreateCashMovementDto,
   ) {
-    return this.cashMovementsService.create(userId, createCashMovementDto);
+    return this.cashMovementsService.create(user.sub, createCashMovementDto);
   }
 
   @Get()
+  @RequireCashRegister()
   @Auth(Role.ADMIN, Role.CAJERO)
-  // @RequireCashRegister()
   @ApiOperation({
     summary: 'Movimientos de caja actual',
     description:
@@ -57,12 +60,10 @@ export class CashMovementsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de movimientos',
+    description: 'Movimientos de caja actual obtenidos exitosamente',
   })
   @ApiResponse({ status: 400, description: 'Sin caja abierta' })
   async findByCurrentCashRegister(@CurrentUser() user: CurrentUserI) {
-    console.log('user get', user);
-
     return this.cashMovementsService.findByCurrentCashRegister(user.sub);
   }
 
@@ -76,16 +77,31 @@ export class CashMovementsController {
   @ApiParam({
     name: 'registerId',
     description: 'UUID de la caja',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de movimientos de la caja',
+    description: 'Lista de movimientos de la caja obtenida exitosamente',
   })
-  @ApiResponse({ status: 400, description: 'UUID inválido' })
+  @ApiResponse({ status: 400, description: 'Id inválido' })
   async findByCashRegister(
-    @Param('registerId', ParseUUIDPipe) registerId: string,
+    @Param(
+      'registerId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El ID de la caja no es válido');
+        },
+      }),
+    )
+    registerId: string,
   ) {
-    return this.cashMovementsService.findByCashRegister(registerId);
+    const result =
+      await this.cashMovementsService.findByCashRegister(registerId);
+    return {
+      success: true,
+      message: 'Lista de movimientos de la caja obtenida exitosamente',
+      data: result,
+    };
   }
 }

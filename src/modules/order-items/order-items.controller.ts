@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -22,11 +23,13 @@ import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { KitchenDisplayQueryDto } from './dto/kitchen-display-query.dto';
 import { SendToKitchenDto } from './dto/send-to-kitchen.dto';
 import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
+import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
 
 @ApiTags('Gestión de items del pedido')
 @Controller('order-items')
 export class OrderItemsController {
   constructor(private readonly orderItemsService: OrderItemsService) {}
+
   @Post('orders/:orderId/items')
   @Auth(Role.ADMIN, Role.CAJERO, Role.MESERO)
   @HttpCode(HttpStatus.CREATED)
@@ -37,7 +40,7 @@ export class OrderItemsController {
   @ApiParam({
     name: 'orderId',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 201,
@@ -66,19 +69,24 @@ export class OrderItemsController {
   })
   @ApiResponse({ status: 404, description: 'Orden o producto no encontrado' })
   async addItem(
-    @Param('orderId', ParseUUIDPipe) orderId: string,
-    @CurrentUser('id') userId: string,
+    @Param(
+      'orderId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El Id de la orden debe no es válido');
+        },
+      }),
+    )
+    orderId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() createOrderItemDto: CreateOrderItemDto,
   ) {
-    const result = await this.orderItemsService.addItem(
+    return this.orderItemsService.addItem(
       orderId,
-      userId,
+      user.sub,
       createOrderItemDto,
     );
-    return {
-      success: true,
-      ...result,
-    };
   }
 
   @Post('orders/:orderId/items/bulk')

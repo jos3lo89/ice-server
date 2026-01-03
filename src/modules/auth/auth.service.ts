@@ -120,7 +120,7 @@ export class AuthService {
       };
 
       const accessToken = await this.jwtService.signAsync(payload, {
-        expiresIn: '1d',
+        expiresIn: '7d',
       });
       const refreshToken = await this.jwtService.signAsync(payload, {
         expiresIn: '7d',
@@ -227,9 +227,8 @@ export class AuthService {
 
       return {
         success: true,
-        data: {
-          message: 'Tu contraseña ha sido actualizada con éxito',
-        },
+        message: 'Tu contraseña ha sido actualizada con éxito',
+        data: null,
       };
     } catch (error) {
       throw new InternalServerErrorException('Error al cambiar al contraseña.');
