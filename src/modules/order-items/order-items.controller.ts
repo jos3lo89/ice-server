@@ -99,15 +99,24 @@ export class OrderItemsController {
   @ApiParam({
     name: 'orderId',
     description: 'UUID de la orden',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 201,
     description: 'Items agregados exitosamente',
   })
   async addBulkItems(
-    @Param('orderId', ParseUUIDPipe) orderId: string,
-    @CurrentUser('id') userId: string,
+    @Param(
+      'orderId',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El id del item no es valido');
+        },
+      }),
+    )
+    orderId: string,
+    @CurrentUser('sub') userId: string,
     @Body() bulkCreateOrderItemsDto: BulkCreateOrderItemsDto,
   ) {
     const result = await this.orderItemsService.addBulkItems(
@@ -131,7 +140,7 @@ export class OrderItemsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del item',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -143,8 +152,17 @@ export class OrderItemsController {
     description: 'Sin permisos para esta transición',
   })
   async updateStatus(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El id del item no es valido');
+        },
+      }),
+    )
+    id: string,
+    @CurrentUser('sub') userId: string,
     @CurrentUser('role') userRole: Role,
     @Body() updateOrderItemStatusDto: UpdateOrderItemStatusDto,
   ) {
@@ -161,7 +179,7 @@ export class OrderItemsController {
   }
 
   @Patch(':id/cancel')
-  @Auth(Role.ADMIN, Role.CAJERO)
+  @Auth(Role.ADMIN, Role.CAJERO, Role.MESERO)
   @ApiOperation({
     summary: 'Cancelar item',
     description:
@@ -170,7 +188,7 @@ export class OrderItemsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del item',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
@@ -178,13 +196,22 @@ export class OrderItemsController {
   })
   @ApiResponse({ status: 400, description: 'No se puede cancelar el item' })
   async cancelItem(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El id del item no es valido');
+        },
+      }),
+    )
+    id: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() cancelOrderItemDto: CancelOrderItemDto,
   ) {
     const result = await this.orderItemsService.cancelItem(
       id,
-      userId,
+      user.sub,
       cancelOrderItemDto,
     );
     return {
