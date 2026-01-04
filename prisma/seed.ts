@@ -104,7 +104,7 @@ async function main() {
     create: {
       name: 'Mesero',
       dni: '22222222',
-      username: 'mesero1',
+      username: 'mesero',
       password_hash: passwordHashMesero,
       role: user_role.MESERO,
       pin: '222222',
@@ -139,8 +139,10 @@ async function main() {
   console.log('new clients: ', [newClient]);
 
   // 5. categorias y subcategorias
-  const catEntradas = await prisma.categories.create({
-    data: {
+  const catEntradas = await prisma.categories.upsert({
+    where: { slug: 'entradas' },
+    update: {},
+    create: {
       name: 'Entradas',
       slug: 'entradas',
       default_area: area_preparacion.COCINA,
@@ -155,8 +157,10 @@ async function main() {
     },
   });
 
-  const catFondos = await prisma.categories.create({
-    data: {
+  const catFondos = await prisma.categories.upsert({
+    where: { slug: 'platos-fondo' },
+    update: {},
+    create: {
       name: 'Platos de Fondo',
       slug: 'platos-fondo',
       default_area: area_preparacion.COCINA,
@@ -178,8 +182,10 @@ async function main() {
   });
 
   if (subCarne) {
-    const newProduct = await prisma.products.create({
-      data: {
+    const newProduct = await prisma.products.upsert({
+      where: { name: 'Lomo Saltado' },
+      update: {},
+      create: {
         category_id: subCarne.id,
         name: 'Lomo Saltado',
         short_name: 'Lomo Salt.',
