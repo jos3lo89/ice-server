@@ -319,11 +319,11 @@ export type categoriesOrderByWithRelationInput = {
 
 export type categoriesWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.categoriesWhereInput | Prisma.categoriesWhereInput[]
   OR?: Prisma.categoriesWhereInput[]
   NOT?: Prisma.categoriesWhereInput | Prisma.categoriesWhereInput[]
   name?: Prisma.StringFilter<"categories"> | string
-  slug?: Prisma.StringFilter<"categories"> | string
   description?: Prisma.StringNullableFilter<"categories"> | string | null
   parent_id?: Prisma.UuidNullableFilter<"categories"> | string | null
   level?: Prisma.IntFilter<"categories"> | number
@@ -338,7 +338,7 @@ export type categoriesWhereUniqueInput = Prisma.AtLeast<{
   parent?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
   children?: Prisma.CategoriesListRelationFilter
   products?: Prisma.ProductsListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type categoriesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

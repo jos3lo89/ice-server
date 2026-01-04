@@ -407,11 +407,11 @@ export type productsOrderByWithRelationInput = {
 
 export type productsWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  name?: string
   AND?: Prisma.productsWhereInput | Prisma.productsWhereInput[]
   OR?: Prisma.productsWhereInput[]
   NOT?: Prisma.productsWhereInput | Prisma.productsWhereInput[]
   category_id?: Prisma.UuidFilter<"products"> | string
-  name?: Prisma.StringFilter<"products"> | string
   short_name?: Prisma.StringNullableFilter<"products"> | string | null
   description?: Prisma.StringNullableFilter<"products"> | string | null
   price?: Prisma.DecimalFilter<"products"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -436,7 +436,7 @@ export type productsWhereUniqueInput = Prisma.AtLeast<{
   order_items?: Prisma.Order_itemsListRelationFilter
   sale_items?: Prisma.Sale_itemsListRelationFilter
   credit_note_items?: Prisma.Credit_note_itemsListRelationFilter
-}, "id">
+}, "id" | "name">
 
 export type productsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
