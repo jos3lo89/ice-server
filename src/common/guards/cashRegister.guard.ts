@@ -34,6 +34,10 @@ export class CashRegisterGuard implements CanActivate {
       user.sub,
     );
 
+    console.log({
+      wwww: hasOpenCash,
+    });
+
     if (!hasOpenCash) {
       throw new ForbiddenException({
         success: false,

@@ -118,7 +118,28 @@ async function main() {
     },
   });
 
-  console.log('new users: ', [newAdmin, newMesero]);
+  const passwordHashCashier = await bcrypt.hash('cajero123', salt);
+  const newCashier = await prisma.users.upsert({
+    where: { username: 'cajero' },
+    update: {},
+    create: {
+      name: 'Cajero',
+      dni: '33333333',
+      username: 'cajero',
+      password_hash: passwordHashCashier,
+      role: user_role.CAJERO,
+      pin: '333333',
+      user_floors: {
+        create: [
+          { floor: { connect: { id: floor1.id } } },
+          { floor: { connect: { id: floor2.id } } },
+          { floor: { connect: { id: floor3.id } } },
+        ],
+      },
+    },
+  });
+
+  console.log('new users: ', [newAdmin, newMesero, newCashier]);
 
   // 4. cliente generico
   const newClient = await prisma.clients.upsert({
@@ -139,6 +160,24 @@ async function main() {
   console.log('new clients: ', [newClient]);
 
   // 5. categorias y subcategorias
+  const catBebidas = await prisma.categories.upsert({
+    where: { slug: 'Bebidas' },
+    update: {},
+    create: {
+      name: 'Bebidas',
+      slug: 'bebidas',
+      default_area: area_preparacion.BEBIDAS,
+      color: '#FF0023',
+      children: {
+        create: [
+          { name: 'Frias', slug: 'frias', level: 3 },
+          { name: 'Tiempo', slug: 'tiempo', level: 3 },
+          { name: 'Caliente', slug: 'caliente', level: 3 },
+        ],
+      },
+    },
+  });
+
   const catEntradas = await prisma.categories.upsert({
     where: { slug: 'entradas' },
     update: {},
@@ -181,6 +220,43 @@ async function main() {
     where: { slug: 'carnes' },
   });
 
+  const subCeviche = await prisma.categories.findFirst({
+    where: { slug: 'ceviches' },
+  });
+
+  const subFrias = await prisma.categories.findFirst({
+    where: { slug: 'frias' },
+  });
+
+  if (subFrias) {
+    const newProduct = await prisma.products.upsert({
+      where: { name: 'Coca cola' },
+      update: {},
+      create: {
+        category_id: subFrias.id,
+        name: 'Coca cola',
+        short_name: 'coca-cola',
+        price: 10.0,
+        area_preparacion: area_preparacion.BEBIDAS,
+        variant_groups: {
+          create: {
+            name: 'tipo',
+            is_required: true,
+            options: {
+              create: [
+                { name: 'normal', is_default: true },
+                { name: 'zero' },
+                { name: 'con cocaina' },
+              ],
+            },
+          },
+        },
+      },
+    });
+
+    console.log('new product: ', [newProduct]);
+  }
+
   if (subCarne) {
     const newProduct = await prisma.products.upsert({
       where: { name: 'Lomo Saltado' },
@@ -200,6 +276,35 @@ async function main() {
                 { name: 'Término medio', is_default: true },
                 { name: 'Tres cuartos' },
                 { name: 'Bien cocido' },
+              ],
+            },
+          },
+        },
+      },
+    });
+
+    console.log('new product: ', [newProduct]);
+  }
+
+  if (subCeviche) {
+    const newProduct = await prisma.products.upsert({
+      where: { name: 'Ceviche' },
+      update: {},
+      create: {
+        category_id: subCeviche.id,
+        name: 'Ceviche',
+        short_name: 'ceviche',
+        price: 33.0,
+        area_preparacion: area_preparacion.COCINA,
+        variant_groups: {
+          create: {
+            name: 'termino de aji',
+            is_required: true,
+            options: {
+              create: [
+                { name: 'Término medio', is_default: true },
+                { name: 'Término alto' },
+                { name: 'incomibke dx', price_modifier: 5 },
               ],
             },
           },

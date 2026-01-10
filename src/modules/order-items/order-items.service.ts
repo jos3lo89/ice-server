@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,16 +11,59 @@ import { OrdersService } from '../orders/orders.service';
 import { PrintersService } from '../printers/printers.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import {
+  area_preparacion,
+  type area_preparacion as area_preparacionT,
   order_item_status,
   order_status,
   user_role,
 } from 'src/generated/prisma/enums';
+
+// Interfaces para tipos de retorno
+interface AddItemResult {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    product_name: string;
+    product_short_name: string | null;
+    quantity: number;
+    unit_price: number;
+    variants_total: number;
+    line_total: number;
+    status: order_item_status;
+    area: area_preparacion;
+    notes: string | null;
+    variants_snapshot: JsonValue;
+  };
+  order_subtotal: number;
+}
+
+interface BulkAddResult {
+  items_added: number;
+  items: OrderItemCreatedDto[];
+  order_subtotal: number;
+}
+
+interface DeleteItemResult {
+  message: string;
+  order_subtotal: number;
+}
+
+interface CancelItemResult {
+  id: string;
+  is_cancelled: boolean;
+  cancelled_at: Date;
+  cancelled_by: string;
+  cancel_reason: string;
+  order_subtotal: number;
+}
 import { BulkCreateOrderItemsDto } from './dto/bulk-create-order-items.dto';
 import { OrderItemCreatedDto } from './dto/order-item-response.dto';
 import { CancelOrderItemDto } from './dto/cancel-order-item.dto';
 import { SendToKitchenDto } from './dto/send-to-kitchen.dto';
 import { KitchenDisplayQueryDto } from './dto/kitchen-display-query.dto';
 import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
+import { JsonValue } from 'src/generated/prisma/internal/prismaNamespace';
 
 @Injectable()
 export class OrderItemsService {
@@ -101,7 +145,7 @@ export class OrderItemsService {
         product_short_name: product.short_name,
         quantity: createOrderItemDto.quantity,
         unit_price: unitPrice,
-        variants_snapshot: JSON.stringify(createOrderItemDto.variants) || [],
+        variants_snapshot: JSON.stringify(createOrderItemDto.variants),
         variants_total: variantsTotal,
         line_total: lineTotal,
         status: order_item_status.PENDIENTE,
@@ -134,7 +178,7 @@ export class OrderItemsService {
         notes: orderItem.notes,
         variants_snapshot: orderItem.variants_snapshot,
       },
-      order_subtotal: Number(updatedOrder?.subtotal || 0),
+      order_subtotal: Number(updatedOrder?.subtotal ?? 0),
     };
   }
 
@@ -162,7 +206,7 @@ export class OrderItemsService {
     return {
       items_added: createdItems.length,
       items: createdItems,
-      order_subtotal: Number(order?.subtotal || 0),
+      order_subtotal: Number(order?.subtotal ?? 0),
     };
   }
 
@@ -233,14 +277,25 @@ export class OrderItemsService {
         is_paid: true,
         order_id: true,
         sent_to_kitchen_at: true,
-        creator: {
-          select: { name: true },
+        order: {
+          select: { status: true },
         },
       },
     });
 
     if (!item) {
       throw new NotFoundException(`Item con ID "${itemId}" no encontrado`);
+    }
+
+    // Validar estado de la orden (solo ABIERTA o CERRADA)
+    const allowedStatuses: order_status[] = [
+      order_status.ABIERTA,
+      order_status.CERRADA,
+    ];
+    if (!allowedStatuses.includes(item.order.status)) {
+      throw new BadRequestException(
+        'Solo se pueden cancelar items de órdenes abiertas o cerradas',
+      );
     }
 
     if (item.is_cancelled) {
@@ -256,7 +311,7 @@ export class OrderItemsService {
     // Si ya fue enviado a cocina, requiere motivo
     if (item.sent_to_kitchen_at && !cancelOrderItemDto.reason) {
       throw new BadRequestException(
-        'Se requiere un motivo para cancelar items que ya fueron enviados a cocina',
+        'Se requiere un motivo para cancelar items enviados a cocina',
       );
     }
 
@@ -277,7 +332,7 @@ export class OrderItemsService {
       },
     });
 
-    // Recalcular total de la orden
+    // Recalcular totales
     await this.ordersService.recalculateTotal(item.order_id);
 
     // Obtener nuevo subtotal
@@ -290,30 +345,52 @@ export class OrderItemsService {
       id: cancelledItem.id,
       is_cancelled: cancelledItem.is_cancelled,
       cancelled_at: cancelledItem.cancelled_at!,
-      cancelled_by: user?.name || 'Desconocido',
-      cancel_reason: cancelledItem.cancel_reason!,
-      order_subtotal: Number(order?.subtotal || 0),
+      cancelled_by: user?.name ?? 'Desconocido',
+      cancel_reason: cancelledItem.cancel_reason ?? '',
+      order_subtotal: Number(order?.subtotal ?? 0),
     };
   }
 
-  /**
-   * Eliminar item (solo si está PENDIENTE)
-   */
-  async deleteItem(
-    itemId: string,
-  ): Promise<{ message: string; order_subtotal: number }> {
+  async deleteItem(itemId: string) {
     const item = await this.prisma.order_items.findUnique({
       where: { id: itemId },
-      select: { status: true, order_id: true },
+      select: {
+        id: true,
+        status: true,
+        order_id: true,
+        is_cancelled: true,
+        is_paid: true,
+        order: {
+          select: { status: true },
+        },
+      },
     });
 
     if (!item) {
-      throw new NotFoundException(`Item con ID "${itemId}" no encontrado`);
+      throw new NotFoundException('Item no encontrado');
     }
 
+    // Validar que la orden esté ABIERTA
+    if (item.order.status !== order_status.ABIERTA) {
+      throw new BadRequestException(
+        'Solo se pueden eliminar items de órdenes abiertas',
+      );
+    }
+
+    // No eliminar items ya cancelados
+    if (item.is_cancelled) {
+      throw new BadRequestException('No se puede eliminar un item cancelado');
+    }
+
+    // No eliminar items pagados
+    if (item.is_paid) {
+      throw new BadRequestException('No se puede eliminar un item pagado');
+    }
+
+    // Solo eliminar items PENDIENTE (no enviados a cocina)
     if (item.status !== order_item_status.PENDIENTE) {
       throw new BadRequestException(
-        'Solo se pueden eliminar items con estado PENDIENTE',
+        'Solo se pueden eliminar items con estado PENDIENTE. Use cancelar para items enviados.',
       );
     }
 
@@ -322,7 +399,7 @@ export class OrderItemsService {
       where: { id: itemId },
     });
 
-    // Recalcular total de la orden
+    // Recalcular totales
     await this.ordersService.recalculateTotal(item.order_id);
 
     // Obtener nuevo subtotal
@@ -333,7 +410,7 @@ export class OrderItemsService {
 
     return {
       message: 'Item eliminado exitosamente',
-      order_subtotal: Number(order?.subtotal || 0),
+      order_subtotal: Number(order?.subtotal ?? 0),
     };
   }
 
@@ -406,9 +483,7 @@ export class OrderItemsService {
     });
 
     if (!order) {
-      throw new NotFoundException(
-        `Orden con ID "${sendToKitchenDto.order_id}" no encontrada`,
-      );
+      throw new NotFoundException('Orden no encontrada');
     }
 
     if (order.status !== order_status.ABIERTA) {
@@ -448,6 +523,14 @@ export class OrderItemsService {
 
     const printJobs: any[] = [];
     const now = new Date();
+
+    const itemsCocina = items.filter((i) => i.area_preparacion === 'COCINA');
+    const itemsBebida = items.filter(
+      (i) => i.area_preparacion === 'BAR' || i.area_preparacion === 'BEBIDAS',
+    );
+
+    console.log('items cocina: ', itemsCocina);
+    console.log('items Bebidas: ', itemsBebida);
 
     // Agrupar por área de preparación
     const itemsByArea = items.reduce(

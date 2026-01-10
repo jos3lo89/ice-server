@@ -20,6 +20,7 @@ import { CancelReservationDto } from './dto/cancel-reservation.dto';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationsQueryDto } from './dto/reservations-query.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
 
 @ApiTags('Gestión de Reservaciones')
 @Controller('reservations')
@@ -45,11 +46,11 @@ export class ReservationsController {
   @ApiResponse({ status: 404, description: 'Mesa no encontrada' })
   @ApiResponse({ status: 409, description: 'Conflicto de horario' })
   async create(
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() createReservationDto: CreateReservationDto,
   ) {
     const result = await this.reservationsService.create(
-      userId,
+      user.sub,
       createReservationDto,
     );
     return {
@@ -196,9 +197,9 @@ export class ReservationsController {
   @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
   async confirm(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
   ) {
-    const result = await this.reservationsService.confirm(id, userId);
+    const result = await this.reservationsService.confirm(id, user.sub);
     return {
       success: true,
       data: result,
@@ -225,12 +226,12 @@ export class ReservationsController {
   @ApiResponse({ status: 404, description: 'Reservación no encontrada' })
   async cancel(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() cancelReservationDto: CancelReservationDto,
   ) {
     const result = await this.reservationsService.cancel(
       id,
-      userId,
+      user.sub,
       cancelReservationDto,
     );
     return {

@@ -82,6 +82,12 @@ export class OrderItemsController {
     @CurrentUser() user: CurrentUserI,
     @Body() createOrderItemDto: CreateOrderItemDto,
   ) {
+    // console.log({
+    //   orderId,
+    //   userId: user.sub,
+    //   createOrderItemDto,
+    // });
+
     return this.orderItemsService.addItem(
       orderId,
       user.sub,
@@ -116,12 +122,12 @@ export class OrderItemsController {
       }),
     )
     orderId: string,
-    @CurrentUser('sub') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() bulkCreateOrderItemsDto: BulkCreateOrderItemsDto,
   ) {
     const result = await this.orderItemsService.addBulkItems(
       orderId,
-      userId,
+      user.sub,
       bulkCreateOrderItemsDto,
     );
     return {
@@ -162,13 +168,13 @@ export class OrderItemsController {
       }),
     )
     id: string,
-    @CurrentUser('sub') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @CurrentUser('role') userRole: Role,
     @Body() updateOrderItemStatusDto: UpdateOrderItemStatusDto,
   ) {
     const result = await this.orderItemsService.updateStatus(
       id,
-      userId,
+      user.sub,
       userRole,
       updateOrderItemStatusDto,
     );
@@ -229,24 +235,28 @@ export class OrderItemsController {
   @ApiParam({
     name: 'id',
     description: 'UUID del item',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 'uuid-v4-123',
   })
   @ApiResponse({
     status: 200,
     description: 'Item eliminado',
-    schema: {
-      example: {
-        success: true,
-        message: 'Item eliminado exitosamente',
-        order_subtotal: 125.5,
-      },
-    },
   })
   @ApiResponse({
     status: 400,
     description: 'Solo se pueden eliminar items PENDIENTE',
   })
-  async deleteItem(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteItem(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El id del item no es valido');
+        },
+      }),
+    )
+    id: string,
+  ) {
     const result = await this.orderItemsService.deleteItem(id);
     return {
       success: true,

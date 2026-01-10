@@ -2705,6 +2705,8 @@ export const Order_itemsScalarFieldEnum = {
   cancelled_at: 'cancelled_at',
   cancelled_by: 'cancelled_by',
   cancel_reason: 'cancel_reason',
+  quantity_paid: 'quantity_paid',
+  amount_paid: 'amount_paid',
   is_paid: 'is_paid',
   paid_at: 'paid_at',
   payment_id: 'payment_id',

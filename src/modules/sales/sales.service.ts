@@ -237,6 +237,8 @@ export class SalesService {
 
   /**
    * Generar venta desde pago (llamado desde PaymentsService)
+   * Soporta tanto pagos completos como incrementales
+   * @param tx - Cliente Prisma opcional para usar dentro de transacciones
    */
   async generateFromPayment(
     paymentId: string,
@@ -244,17 +246,18 @@ export class SalesService {
     clientId: string | undefined,
     userId: string,
     cashRegisterId: string,
+    tx?: Parameters<Parameters<typeof this.prisma.$transaction>[0]>[0],
   ) {
-    // Obtener pago con orden e items
-    const payment = await this.prisma.payments.findUnique({
+    const prismaClient = tx || this.prisma;
+
+    // Obtener pago con payment_items para pagos incrementales
+    const payment = await prismaClient.payments.findUnique({
       where: { id: paymentId },
       include: {
-        order: {
+        order: true,
+        payment_items: {
           include: {
-            order_items: {
-              where: {
-                payment_id: paymentId,
-              },
+            order_item: {
               include: {
                 product: true,
               },
@@ -265,74 +268,135 @@ export class SalesService {
     });
 
     if (!payment) {
-      throw new NotFoundException(`Pago con ID "${paymentId}" no encontrado`);
+      throw new NotFoundException('Pago no encontrado');
     }
 
     // Obtener o crear cliente
     if (clientId) {
-      const client = await this.prisma.clients.findUnique({
+      const client = await prismaClient.clients.findUnique({
         where: { id: clientId },
       });
       if (!client) {
-        throw new NotFoundException(
-          `Cliente con ID "${clientId}" no encontrado`,
-        );
+        throw new NotFoundException('Cliente no encontrado');
       }
     }
 
     // Obtener correlativo
     const serie = this.getSerieByType(documentType);
-    const correlative = await this.getNextCorrelative(documentType, serie);
+    const correlative = await this.getNextCorrelative(documentType, serie, prismaClient as typeof this.prisma);
 
-    // Calcular totales
-    const items = payment.order.order_items;
     let montoGravado = 0;
     let montoIgv = 0;
+    let saleItems: Array<{
+      order_item_id: string;
+      product_id: string;
+      codigo_producto: string | null;
+      descripcion: string;
+      unidad_medida: string;
+      cantidad: number;
+      mto_valor_unitario: number;
+      mto_precio_unitario: number;
+      mto_valor_venta: number;
+      afectacion_igv: string;
+      mto_base_igv: number;
+      mto_igv: number;
+      total_impuestos: number;
+      variantes_descripcion: string | null;
+    }> = [];
 
-    const saleItems = items.map((item) => {
-      const lineTotal = Number(item.line_total);
-      const valorVenta = lineTotal / 1.18; // Sin IGV
-      const igv = lineTotal - valorVenta;
+    // Verificar si es pago incremental (tiene payment_items) o pago completo
+    if (payment.payment_items && payment.payment_items.length > 0) {
+      // PAGO INCREMENTAL: usar payment_items para calcular montos parciales
+      saleItems = payment.payment_items.map((paymentItem) => {
+        const item = paymentItem.order_item;
+        const lineTotal = Number(paymentItem.amount); // Usar monto del payment_item
+        const valorVenta = lineTotal / 1.18;
+        const igv = lineTotal - valorVenta;
 
-      montoGravado += valorVenta;
-      montoIgv += igv;
+        montoGravado += valorVenta;
+        montoIgv += igv;
 
-      // Construir descripción con variantes
-      let descripcion = item.product_name;
-      if (item.variants_snapshot && Array.isArray(item.variants_snapshot)) {
-        const variantesText = item.variants_snapshot
-          .map((v: any) => v.option_name)
-          .join(', ');
-        if (variantesText) {
-          descripcion += ` (${variantesText})`;
+        let descripcion = item.product_name;
+        if (item.variants_snapshot && Array.isArray(item.variants_snapshot)) {
+          const variantesText = (item.variants_snapshot as Array<{ option_name: string }>)
+            .map((v) => v.option_name)
+            .join(', ');
+          if (variantesText) {
+            descripcion += ` (${variantesText})`;
+          }
         }
-      }
 
-      return {
-        order_item_id: item.id,
-        product_id: item.product_id,
-        codigo_producto: item.product.codigo_producto || null,
-        descripcion,
-        unidad_medida: item.product.unidad_medida,
-        cantidad: item.quantity,
-        mto_valor_unitario: valorVenta / item.quantity,
-        mto_precio_unitario: lineTotal / item.quantity,
-        mto_valor_venta: valorVenta,
-        afectacion_igv: item.product.afectacion_igv,
-        mto_base_igv: valorVenta,
-        mto_igv: igv,
-        total_impuestos: igv,
-        variantes_descripcion:
-          item.variants_snapshot && Array.isArray(item.variants_snapshot)
-            ? item.variants_snapshot.map((v: any) => v.option_name).join(', ')
-            : null,
-      };
-    });
+        return {
+          order_item_id: item.id,
+          product_id: item.product_id,
+          codigo_producto: item.product.codigo_producto || null,
+          descripcion,
+          unidad_medida: item.product.unidad_medida,
+          cantidad: paymentItem.quantity_paid, // Cantidad pagada en este pago
+          mto_valor_unitario: valorVenta / paymentItem.quantity_paid,
+          mto_precio_unitario: lineTotal / paymentItem.quantity_paid,
+          mto_valor_venta: valorVenta,
+          afectacion_igv: item.product.afectacion_igv,
+          mto_base_igv: valorVenta,
+          mto_igv: igv,
+          total_impuestos: igv,
+          variantes_descripcion:
+            item.variants_snapshot && Array.isArray(item.variants_snapshot)
+              ? (item.variants_snapshot as Array<{ option_name: string }>).map((v) => v.option_name).join(', ')
+              : null,
+        };
+      });
+    } else {
+      // PAGO COMPLETO: obtener items directamente por payment_id
+      const orderItems = await prismaClient.order_items.findMany({
+        where: { payment_id: paymentId },
+        include: { product: true },
+      });
+
+      saleItems = orderItems.map((item) => {
+        const lineTotal = Number(item.line_total);
+        const valorVenta = lineTotal / 1.18;
+        const igv = lineTotal - valorVenta;
+
+        montoGravado += valorVenta;
+        montoIgv += igv;
+
+        let descripcion = item.product_name;
+        if (item.variants_snapshot && Array.isArray(item.variants_snapshot)) {
+          const variantesText = (item.variants_snapshot as Array<{ option_name: string }>)
+            .map((v) => v.option_name)
+            .join(', ');
+          if (variantesText) {
+            descripcion += ` (${variantesText})`;
+          }
+        }
+
+        return {
+          order_item_id: item.id,
+          product_id: item.product_id,
+          codigo_producto: item.product.codigo_producto || null,
+          descripcion,
+          unidad_medida: item.product.unidad_medida,
+          cantidad: item.quantity,
+          mto_valor_unitario: valorVenta / item.quantity,
+          mto_precio_unitario: lineTotal / item.quantity,
+          mto_valor_venta: valorVenta,
+          afectacion_igv: item.product.afectacion_igv,
+          mto_base_igv: valorVenta,
+          mto_igv: igv,
+          total_impuestos: igv,
+          variantes_descripcion:
+            item.variants_snapshot && Array.isArray(item.variants_snapshot)
+              ? (item.variants_snapshot as Array<{ option_name: string }>).map((v) => v.option_name).join(', ')
+              : null,
+        };
+      });
+    }
 
     const precioVentaTotal = montoGravado + montoIgv;
 
     // Crear venta
-    const sale = await this.prisma.sales.create({
+    const sale = await prismaClient.sales.create({
       data: {
         tipo_comprobante: documentType,
         serie,
@@ -366,7 +430,7 @@ export class SalesService {
     });
 
     // Actualizar correlativo
-    await this.updateCorrelative(documentType, serie, correlative);
+    await this.updateCorrelative(documentType, serie, correlative, prismaClient as typeof this.prisma);
 
     // TODO: Si no es TICKET, enviar a SUNAT
     // if (documentType !== comprobante_type.TICKET) {
@@ -394,8 +458,9 @@ export class SalesService {
   private async getNextCorrelative(
     tipo: string,
     serie: string,
+    prismaClient: typeof this.prisma = this.prisma,
   ): Promise<number> {
-    const correlative = await this.prisma.correlatives.findUnique({
+    const correlative = await prismaClient.correlatives.findUnique({
       where: {
         tipo_documento_serie: {
           tipo_documento: tipo === 'TICKET' ? 'TK' : tipo.substring(0, 2),
@@ -406,7 +471,7 @@ export class SalesService {
 
     if (!correlative) {
       // Crear si no existe
-      await this.prisma.correlatives.create({
+      await prismaClient.correlatives.create({
         data: {
           tipo_documento: tipo === 'TICKET' ? 'TK' : tipo.substring(0, 2),
           serie,
@@ -426,8 +491,9 @@ export class SalesService {
     tipo: string,
     serie: string,
     newCorrelative: number,
+    prismaClient: typeof this.prisma = this.prisma,
   ) {
-    await this.prisma.correlatives.update({
+    await prismaClient.correlatives.update({
       where: {
         tipo_documento_serie: {
           tipo_documento: tipo === 'TICKET' ? 'TK' : tipo.substring(0, 2),

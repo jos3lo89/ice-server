@@ -31,6 +31,7 @@ enum order_status {
   ABIERTA
   CERRADA
   PARCIALMENTE_PAGADA
+  EN_PAGO_DIVIDIDO
   PAGADA
   CANCELADA
 }
@@ -411,6 +412,8 @@ model order_items {
   cancelled_at       DateTime?         @db.Timestamptz(6)
   cancelled_by       String?           @db.Uuid
   cancel_reason      String?           @db.Text
+  quantity_paid      Int               @default(0)
+  amount_paid        Decimal           @default(0) @db.Decimal(12, 2)
   is_paid            Boolean           @default(false)
   paid_at            DateTime?         @db.Timestamptz(6)
   payment_id         String?           @db.Uuid

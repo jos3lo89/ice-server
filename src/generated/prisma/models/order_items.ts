@@ -31,6 +31,8 @@ export type Order_itemsAvgAggregateOutputType = {
   unit_price: runtime.Decimal | null
   variants_total: runtime.Decimal | null
   line_total: runtime.Decimal | null
+  quantity_paid: number | null
+  amount_paid: runtime.Decimal | null
 }
 
 export type Order_itemsSumAggregateOutputType = {
@@ -38,6 +40,8 @@ export type Order_itemsSumAggregateOutputType = {
   unit_price: runtime.Decimal | null
   variants_total: runtime.Decimal | null
   line_total: runtime.Decimal | null
+  quantity_paid: number | null
+  amount_paid: runtime.Decimal | null
 }
 
 export type Order_itemsMinAggregateOutputType = {
@@ -60,6 +64,8 @@ export type Order_itemsMinAggregateOutputType = {
   cancelled_at: Date | null
   cancelled_by: string | null
   cancel_reason: string | null
+  quantity_paid: number | null
+  amount_paid: runtime.Decimal | null
   is_paid: boolean | null
   paid_at: Date | null
   payment_id: string | null
@@ -88,6 +94,8 @@ export type Order_itemsMaxAggregateOutputType = {
   cancelled_at: Date | null
   cancelled_by: string | null
   cancel_reason: string | null
+  quantity_paid: number | null
+  amount_paid: runtime.Decimal | null
   is_paid: boolean | null
   paid_at: Date | null
   payment_id: string | null
@@ -117,6 +125,8 @@ export type Order_itemsCountAggregateOutputType = {
   cancelled_at: number
   cancelled_by: number
   cancel_reason: number
+  quantity_paid: number
+  amount_paid: number
   is_paid: number
   paid_at: number
   payment_id: number
@@ -132,6 +142,8 @@ export type Order_itemsAvgAggregateInputType = {
   unit_price?: true
   variants_total?: true
   line_total?: true
+  quantity_paid?: true
+  amount_paid?: true
 }
 
 export type Order_itemsSumAggregateInputType = {
@@ -139,6 +151,8 @@ export type Order_itemsSumAggregateInputType = {
   unit_price?: true
   variants_total?: true
   line_total?: true
+  quantity_paid?: true
+  amount_paid?: true
 }
 
 export type Order_itemsMinAggregateInputType = {
@@ -161,6 +175,8 @@ export type Order_itemsMinAggregateInputType = {
   cancelled_at?: true
   cancelled_by?: true
   cancel_reason?: true
+  quantity_paid?: true
+  amount_paid?: true
   is_paid?: true
   paid_at?: true
   payment_id?: true
@@ -189,6 +205,8 @@ export type Order_itemsMaxAggregateInputType = {
   cancelled_at?: true
   cancelled_by?: true
   cancel_reason?: true
+  quantity_paid?: true
+  amount_paid?: true
   is_paid?: true
   paid_at?: true
   payment_id?: true
@@ -218,6 +236,8 @@ export type Order_itemsCountAggregateInputType = {
   cancelled_at?: true
   cancelled_by?: true
   cancel_reason?: true
+  quantity_paid?: true
+  amount_paid?: true
   is_paid?: true
   paid_at?: true
   payment_id?: true
@@ -334,6 +354,8 @@ export type Order_itemsGroupByOutputType = {
   cancelled_at: Date | null
   cancelled_by: string | null
   cancel_reason: string | null
+  quantity_paid: number
+  amount_paid: runtime.Decimal
   is_paid: boolean
   paid_at: Date | null
   payment_id: string | null
@@ -386,6 +408,8 @@ export type order_itemsWhereInput = {
   cancelled_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   cancelled_by?: Prisma.UuidNullableFilter<"order_items"> | string | null
   cancel_reason?: Prisma.StringNullableFilter<"order_items"> | string | null
+  quantity_paid?: Prisma.IntFilter<"order_items"> | number
+  amount_paid?: Prisma.DecimalFilter<"order_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFilter<"order_items"> | boolean
   paid_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   payment_id?: Prisma.UuidNullableFilter<"order_items"> | string | null
@@ -422,6 +446,8 @@ export type order_itemsOrderByWithRelationInput = {
   cancelled_at?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelled_by?: Prisma.SortOrderInput | Prisma.SortOrder
   cancel_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   paid_at?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -461,6 +487,8 @@ export type order_itemsWhereUniqueInput = Prisma.AtLeast<{
   cancelled_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   cancelled_by?: Prisma.UuidNullableFilter<"order_items"> | string | null
   cancel_reason?: Prisma.StringNullableFilter<"order_items"> | string | null
+  quantity_paid?: Prisma.IntFilter<"order_items"> | number
+  amount_paid?: Prisma.DecimalFilter<"order_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFilter<"order_items"> | boolean
   paid_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   payment_id?: Prisma.UuidNullableFilter<"order_items"> | string | null
@@ -497,6 +525,8 @@ export type order_itemsOrderByWithAggregationInput = {
   cancelled_at?: Prisma.SortOrderInput | Prisma.SortOrder
   cancelled_by?: Prisma.SortOrderInput | Prisma.SortOrder
   cancel_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   paid_at?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -534,6 +564,8 @@ export type order_itemsScalarWhereWithAggregatesInput = {
   cancelled_at?: Prisma.DateTimeNullableWithAggregatesFilter<"order_items"> | Date | string | null
   cancelled_by?: Prisma.UuidNullableWithAggregatesFilter<"order_items"> | string | null
   cancel_reason?: Prisma.StringNullableWithAggregatesFilter<"order_items"> | string | null
+  quantity_paid?: Prisma.IntWithAggregatesFilter<"order_items"> | number
+  amount_paid?: Prisma.DecimalWithAggregatesFilter<"order_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolWithAggregatesFilter<"order_items"> | boolean
   paid_at?: Prisma.DateTimeNullableWithAggregatesFilter<"order_items"> | Date | string | null
   payment_id?: Prisma.UuidNullableWithAggregatesFilter<"order_items"> | string | null
@@ -559,6 +591,8 @@ export type order_itemsCreateInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -594,6 +628,8 @@ export type order_itemsUncheckedCreateInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -621,6 +657,8 @@ export type order_itemsUpdateInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -656,6 +694,8 @@ export type order_itemsUncheckedUpdateInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,6 +727,8 @@ export type order_itemsCreateManyInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -712,6 +754,8 @@ export type order_itemsUpdateManyMutationInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -740,6 +784,8 @@ export type order_itemsUncheckedUpdateManyInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -779,6 +825,8 @@ export type order_itemsCountOrderByAggregateInput = {
   cancelled_at?: Prisma.SortOrder
   cancelled_by?: Prisma.SortOrder
   cancel_reason?: Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   paid_at?: Prisma.SortOrder
   payment_id?: Prisma.SortOrder
@@ -792,6 +840,8 @@ export type order_itemsAvgOrderByAggregateInput = {
   unit_price?: Prisma.SortOrder
   variants_total?: Prisma.SortOrder
   line_total?: Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
 }
 
 export type order_itemsMaxOrderByAggregateInput = {
@@ -814,6 +864,8 @@ export type order_itemsMaxOrderByAggregateInput = {
   cancelled_at?: Prisma.SortOrder
   cancelled_by?: Prisma.SortOrder
   cancel_reason?: Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   paid_at?: Prisma.SortOrder
   payment_id?: Prisma.SortOrder
@@ -842,6 +894,8 @@ export type order_itemsMinOrderByAggregateInput = {
   cancelled_at?: Prisma.SortOrder
   cancelled_by?: Prisma.SortOrder
   cancel_reason?: Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   paid_at?: Prisma.SortOrder
   payment_id?: Prisma.SortOrder
@@ -855,6 +909,8 @@ export type order_itemsSumOrderByAggregateInput = {
   unit_price?: Prisma.SortOrder
   variants_total?: Prisma.SortOrder
   line_total?: Prisma.SortOrder
+  quantity_paid?: Prisma.SortOrder
+  amount_paid?: Prisma.SortOrder
 }
 
 export type Order_itemsScalarRelationFilter = {
@@ -1128,6 +1184,8 @@ export type order_itemsCreateWithoutPrinterInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1161,6 +1219,8 @@ export type order_itemsUncheckedCreateWithoutPrinterInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1221,6 +1281,8 @@ export type order_itemsScalarWhereInput = {
   cancelled_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   cancelled_by?: Prisma.UuidNullableFilter<"order_items"> | string | null
   cancel_reason?: Prisma.StringNullableFilter<"order_items"> | string | null
+  quantity_paid?: Prisma.IntFilter<"order_items"> | number
+  amount_paid?: Prisma.DecimalFilter<"order_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFilter<"order_items"> | boolean
   paid_at?: Prisma.DateTimeNullableFilter<"order_items"> | Date | string | null
   payment_id?: Prisma.UuidNullableFilter<"order_items"> | string | null
@@ -1246,6 +1308,8 @@ export type order_itemsCreateWithoutCreatorInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1280,6 +1344,8 @@ export type order_itemsUncheckedCreateWithoutCreatorInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1316,6 +1382,8 @@ export type order_itemsCreateWithoutCancellerInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1349,6 +1417,8 @@ export type order_itemsUncheckedCreateWithoutCancellerInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1418,6 +1488,8 @@ export type order_itemsCreateWithoutProductInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1451,6 +1523,8 @@ export type order_itemsUncheckedCreateWithoutProductInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1504,6 +1578,8 @@ export type order_itemsCreateWithoutOrderInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1537,6 +1613,8 @@ export type order_itemsUncheckedCreateWithoutOrderInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1590,6 +1668,8 @@ export type order_itemsCreateWithoutPayment_itemsInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1624,6 +1704,8 @@ export type order_itemsUncheckedCreateWithoutPayment_itemsInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1666,6 +1748,8 @@ export type order_itemsUpdateWithoutPayment_itemsInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1700,6 +1784,8 @@ export type order_itemsUncheckedUpdateWithoutPayment_itemsInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1726,6 +1812,8 @@ export type order_itemsCreateWithoutSale_itemsInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1760,6 +1848,8 @@ export type order_itemsUncheckedCreateWithoutSale_itemsInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1802,6 +1892,8 @@ export type order_itemsUpdateWithoutSale_itemsInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1836,6 +1928,8 @@ export type order_itemsUncheckedUpdateWithoutSale_itemsInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1865,6 +1959,8 @@ export type order_itemsCreateManyPrinterInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -1890,6 +1986,8 @@ export type order_itemsUpdateWithoutPrinterInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1923,6 +2021,8 @@ export type order_itemsUncheckedUpdateWithoutPrinterInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1953,6 +2053,8 @@ export type order_itemsUncheckedUpdateManyWithoutPrinterInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1982,6 +2084,8 @@ export type order_itemsCreateManyCreatorInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -2009,6 +2113,8 @@ export type order_itemsCreateManyCancellerInput = {
   is_cancelled?: boolean
   cancelled_at?: Date | string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -2034,6 +2140,8 @@ export type order_itemsUpdateWithoutCreatorInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2068,6 +2176,8 @@ export type order_itemsUncheckedUpdateWithoutCreatorInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2098,6 +2208,8 @@ export type order_itemsUncheckedUpdateManyWithoutCreatorInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2122,6 +2234,8 @@ export type order_itemsUpdateWithoutCancellerInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2155,6 +2269,8 @@ export type order_itemsUncheckedUpdateWithoutCancellerInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2185,6 +2301,8 @@ export type order_itemsUncheckedUpdateManyWithoutCancellerInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2213,6 +2331,8 @@ export type order_itemsCreateManyProductInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -2238,6 +2358,8 @@ export type order_itemsUpdateWithoutProductInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2271,6 +2393,8 @@ export type order_itemsUncheckedUpdateWithoutProductInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2301,6 +2425,8 @@ export type order_itemsUncheckedUpdateManyWithoutProductInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2329,6 +2455,8 @@ export type order_itemsCreateManyOrderInput = {
   cancelled_at?: Date | string | null
   cancelled_by?: string | null
   cancel_reason?: string | null
+  quantity_paid?: number
+  amount_paid?: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: boolean
   paid_at?: Date | string | null
   payment_id?: string | null
@@ -2354,6 +2482,8 @@ export type order_itemsUpdateWithoutOrderInput = {
   is_cancelled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2387,6 +2517,8 @@ export type order_itemsUncheckedUpdateWithoutOrderInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2417,6 +2549,8 @@ export type order_itemsUncheckedUpdateManyWithoutOrderInput = {
   cancelled_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cancelled_by?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cancel_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity_paid?: Prisma.IntFieldUpdateOperationsInput | number
+  amount_paid?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payment_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2486,6 +2620,8 @@ export type order_itemsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   cancelled_at?: boolean
   cancelled_by?: boolean
   cancel_reason?: boolean
+  quantity_paid?: boolean
+  amount_paid?: boolean
   is_paid?: boolean
   paid_at?: boolean
   payment_id?: boolean
@@ -2523,6 +2659,8 @@ export type order_itemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   cancelled_at?: boolean
   cancelled_by?: boolean
   cancel_reason?: boolean
+  quantity_paid?: boolean
+  amount_paid?: boolean
   is_paid?: boolean
   paid_at?: boolean
   payment_id?: boolean
@@ -2557,6 +2695,8 @@ export type order_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   cancelled_at?: boolean
   cancelled_by?: boolean
   cancel_reason?: boolean
+  quantity_paid?: boolean
+  amount_paid?: boolean
   is_paid?: boolean
   paid_at?: boolean
   payment_id?: boolean
@@ -2591,6 +2731,8 @@ export type order_itemsSelectScalar = {
   cancelled_at?: boolean
   cancelled_by?: boolean
   cancel_reason?: boolean
+  quantity_paid?: boolean
+  amount_paid?: boolean
   is_paid?: boolean
   paid_at?: boolean
   payment_id?: boolean
@@ -2599,7 +2741,7 @@ export type order_itemsSelectScalar = {
   updated_at?: boolean
 }
 
-export type order_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "product_id" | "product_name" | "product_short_name" | "quantity" | "unit_price" | "variants_snapshot" | "variants_total" | "line_total" | "status" | "area_preparacion" | "sent_to_kitchen_at" | "printed_at" | "printer_id" | "notes" | "is_cancelled" | "cancelled_at" | "cancelled_by" | "cancel_reason" | "is_paid" | "paid_at" | "payment_id" | "created_by" | "created_at" | "updated_at", ExtArgs["result"]["order_items"]>
+export type order_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "product_id" | "product_name" | "product_short_name" | "quantity" | "unit_price" | "variants_snapshot" | "variants_total" | "line_total" | "status" | "area_preparacion" | "sent_to_kitchen_at" | "printed_at" | "printer_id" | "notes" | "is_cancelled" | "cancelled_at" | "cancelled_by" | "cancel_reason" | "quantity_paid" | "amount_paid" | "is_paid" | "paid_at" | "payment_id" | "created_by" | "created_at" | "updated_at", ExtArgs["result"]["order_items"]>
 export type order_itemsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.ordersDefaultArgs<ExtArgs>
   product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
@@ -2657,6 +2799,8 @@ export type $order_itemsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     cancelled_at: Date | null
     cancelled_by: string | null
     cancel_reason: string | null
+    quantity_paid: number
+    amount_paid: runtime.Decimal
     is_paid: boolean
     paid_at: Date | null
     payment_id: string | null
@@ -3113,6 +3257,8 @@ export interface order_itemsFieldRefs {
   readonly cancelled_at: Prisma.FieldRef<"order_items", 'DateTime'>
   readonly cancelled_by: Prisma.FieldRef<"order_items", 'String'>
   readonly cancel_reason: Prisma.FieldRef<"order_items", 'String'>
+  readonly quantity_paid: Prisma.FieldRef<"order_items", 'Int'>
+  readonly amount_paid: Prisma.FieldRef<"order_items", 'Decimal'>
   readonly is_paid: Prisma.FieldRef<"order_items", 'Boolean'>
   readonly paid_at: Prisma.FieldRef<"order_items", 'DateTime'>
   readonly payment_id: Prisma.FieldRef<"order_items", 'String'>

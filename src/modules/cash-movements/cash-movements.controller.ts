@@ -28,11 +28,7 @@ export class CashMovementsController {
   @RequireCashRegister()
   @Auth(Role.ADMIN, Role.CAJERO)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({
-    summary: 'Registrar movimiento de caja',
-    description:
-      'Registra un ingreso o egreso manual en la caja actual. Requiere caja abierta. ADMIN y CAJERO.',
-  })
+  @ApiOperation({ summary: 'Registrar movimiento de caja' })
   @ApiResponse({
     status: 201,
     description: 'Movimiento registrado exitosamente',
@@ -47,7 +43,12 @@ export class CashMovementsController {
     @CurrentUser() user: CurrentUserI,
     @Body() createCashMovementDto: CreateCashMovementDto,
   ) {
-    return this.cashMovementsService.create(user.sub, createCashMovementDto);
+    const result = await this.cashMovementsService.create(
+      user.sub,
+      createCashMovementDto,
+    );
+
+    return result;
   }
 
   @Get()

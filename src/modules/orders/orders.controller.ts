@@ -22,6 +22,9 @@ import { OrderHistoryDto } from './dto/order-history.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CloseOrderDto } from './dto/close-order.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
+import { CashRegisterGuard } from 'src/common/guards/cashRegister.guard';
+import { RequireCashRegister } from 'src/common/decorators/requireCashRegister.decorator';
+import { CurrentCash } from 'src/common/decorators/CurrentCash.decorator';
 
 @ApiTags('Gestión de pedidos')
 @Controller('orders')
@@ -241,13 +244,10 @@ export class OrdersController {
   }
 
   @Patch(':id/cancel')
+  @RequireCashRegister()
   @Auth(Role.ADMIN, Role.CAJERO, Role.MESERO)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Cancelar orden completa',
-    description:
-      'Cancela una orden completa y todos sus items. Solo ADMIN y CAJERO.',
-  })
+  @ApiOperation({ summary: 'Cancelar orden completa' })
   @ApiParam({
     name: 'id',
     description: 'UUID de la orden',
@@ -263,6 +263,8 @@ export class OrdersController {
   })
   @ApiResponse({ status: 404, description: 'Orden no encontrada' })
   async cancel(
+    @CurrentUser() user: CurrentUserI,
+    @CurrentCash() cashId: string,
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -275,6 +277,31 @@ export class OrdersController {
     id: string,
     @Body() cancelOrderDto: CancelOrderDto,
   ) {
-    return this.ordersService.cancel(id, cancelOrderDto);
+    console.log({
+      user,
+      orderId: id,
+      cancelOrderDto,
+    });
+
+    return await this.ordersService.cancel(
+      id,
+      user.sub,
+      cancelOrderDto,
+      cashId,
+    );
   }
+
+  @Patch(':id/calce-order-waiter')
+  async cancelOrderWithWaiter(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory() {
+          return new BadRequestException('El id de la orden es invalida');
+        },
+      }),
+    )
+    id: string,
+  ) {}
 }

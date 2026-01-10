@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -104,6 +105,10 @@ export class CashRegistersService {
     const difference =
       closeCashRegisterDto.final_amount - Number(cashRegister.expected_amount);
 
+    console.log({
+      difference,
+    });
+
     try {
       const closedCashRegister = await this.prisma.cash_registers.update({
         where: { id: cashRegister.id },
@@ -118,12 +123,18 @@ export class CashRegistersService {
         },
       });
 
-      const summary = await this.getSummary(closedCashRegister.id);
+      const { data } = await this.getSummary(closedCashRegister.id);
 
       return {
         succes: true,
         message: 'Caja cerrada exitosamente',
-        data: summary,
+        data: {
+          ...data,
+          open_time: closedCashRegister.open_time,
+          close_time: closedCashRegister.close_time,
+          initial_amount: closedCashRegister.initial_amount,
+          final_amount: closedCashRegister.final_amount,
+        },
       };
     } catch (error) {
       this.logger.error('Error interno al cerrar caja', error);
@@ -192,6 +203,7 @@ export class CashRegistersService {
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
+
     try {
       const cashRegisters = await this.prisma.cash_registers.findMany({
         where: {
@@ -225,11 +237,14 @@ export class CashRegistersService {
           close_time: cr.close_time,
           initial_amount: Number(cr.initial_amount),
           expected_amount: Number(cr.expected_amount),
-          final_amount: cr.final_amount ? Number(cr.final_amount) : undefined,
-          difference: cr.difference ? Number(cr.difference) : undefined,
+          final_amount: cr.final_amount ? cr.final_amount.toNumber() : null,
+          // difference: cr.difference ? Number(cr.difference) : undefined,
+          difference: Number(cr.difference),
           status: cr.status,
           sales_count: cr._count.sales,
           total_sales: Number(cr.total_sales),
+          current_balance:
+            cr.initial_amount.toNumber() + cr.total_sales.toNumber(),
         })),
       };
     } catch (error) {
@@ -482,62 +497,62 @@ export class CashRegistersService {
   /**
    * Actualizar totales de la caja (llamado al crear ventas o movimientos)
    */
-  async updateTotals(cashRegisterId: string): Promise<void> {
-    // Obtener total de ventas
-    const salesTotal = await this.prisma.sales.aggregate({
-      where: { cash_register_id: cashRegisterId },
-      _sum: { precio_venta_total: true },
-    });
+  // async updateTotals(cashRegisterId: string): Promise<void> {
+  //   // Obtener total de ventas
+  //   const salesTotal = await this.prisma.sales.aggregate({
+  //     where: { cash_register_id: cashRegisterId },
+  //     _sum: { precio_venta_total: true },
+  //   });
 
-    // Obtener total de ingresos manuales
-    const incomeTotal = await this.prisma.cash_movements.aggregate({
-      where: {
-        cash_register_id: cashRegisterId,
-        type: 'INGRESO',
-        is_automatic: false,
-      },
-      _sum: { amount: true },
-    });
+  //   // Obtener total de ingresos manuales
+  //   const incomeTotal = await this.prisma.cash_movements.aggregate({
+  //     where: {
+  //       cash_register_id: cashRegisterId,
+  //       type: 'INGRESO',
+  //       is_automatic: false,
+  //     },
+  //     _sum: { amount: true },
+  //   });
 
-    // Obtener total de egresos
-    const expenseTotal = await this.prisma.cash_movements.aggregate({
-      where: {
-        cash_register_id: cashRegisterId,
-        type: 'EGRESO',
-      },
-      _sum: { amount: true },
-    });
+  //   // Obtener total de egresos
+  //   const expenseTotal = await this.prisma.cash_movements.aggregate({
+  //     where: {
+  //       cash_register_id: cashRegisterId,
+  //       type: 'EGRESO',
+  //     },
+  //     _sum: { amount: true },
+  //   });
 
-    // Obtener monto inicial
-    const cashRegister = await this.prisma.cash_registers.findUnique({
-      where: { id: cashRegisterId },
-      select: { initial_amount: true },
-    });
+  //   // Obtener monto inicial
+  //   const cashRegister = await this.prisma.cash_registers.findUnique({
+  //     where: { id: cashRegisterId },
+  //     select: { initial_amount: true },
+  //   });
 
-    if (!cashRegister) {
-      return;
-    }
+  //   if (!cashRegister) {
+  //     return;
+  //   }
 
-    const totalSales = Number(salesTotal._sum.precio_venta_total || 0);
-    const totalIncome = Number(incomeTotal._sum.amount || 0);
-    const totalExpense = Number(expenseTotal._sum.amount || 0);
-    const expectedAmount =
-      Number(cashRegister.initial_amount) +
-      totalSales +
-      totalIncome -
-      totalExpense;
+  //   const totalSales = Number(salesTotal._sum.precio_venta_total || 0);
+  //   const totalIncome = Number(incomeTotal._sum.amount || 0);
+  //   const totalExpense = Number(expenseTotal._sum.amount || 0);
+  //   const expectedAmount =
+  //     Number(cashRegister.initial_amount) +
+  //     totalSales +
+  //     totalIncome -
+  //     totalExpense;
 
-    // Actualizar caja
-    await this.prisma.cash_registers.update({
-      where: { id: cashRegisterId },
-      data: {
-        total_sales: totalSales,
-        total_income: totalIncome,
-        total_expense: totalExpense,
-        expected_amount: expectedAmount,
-      },
-    });
-  }
+  //   // Actualizar caja
+  //   await this.prisma.cash_registers.update({
+  //     where: { id: cashRegisterId },
+  //     data: {
+  //       total_sales: totalSales,
+  //       total_income: totalIncome,
+  //       total_expense: totalExpense,
+  //       expected_amount: expectedAmount,
+  //     },
+  //   });
+  // }
 
   async hasOpenCashRegister(userId: string) {
     try {
@@ -547,6 +562,8 @@ export class CashRegistersService {
           status: 'ABIERTA',
         },
       });
+
+      console.log('wadafa', count);
 
       return count > 0;
     } catch (error) {
@@ -572,6 +589,60 @@ export class CashRegistersService {
       this.logger.error('Error interno al obtener ID de caja abierta', error);
       throw new InternalServerErrorException(
         'Error interno al obtener ID de caja abierta',
+      );
+    }
+  }
+
+  /**
+   * Obtener ventas de la caja actual
+   */
+  async getCurrentSales(userId: string) {
+    const cashRegisterId = await this.getOpenCashRegisterId(userId);
+
+    if (!cashRegisterId) {
+      throw new BadRequestException('No tiene una caja abierta');
+    }
+
+    try {
+      const sales = await this.prisma.sales.findMany({
+        where: { cash_register_id: cashRegisterId },
+        include: {
+          client: {
+            select: {
+              razon_social: true,
+            },
+          },
+          payment: {
+            select: {
+              payer_name: true,
+            },
+          },
+        },
+        orderBy: { created_at: 'desc' },
+      });
+
+      return {
+        success: true,
+        message: 'Ventas de caja actual obtenidas exitosamente',
+        data: sales.map((sale) => ({
+          id: sale.id,
+          numero_completo: sale.numero_completo,
+          tipo_comprobante: sale.tipo_comprobante,
+          payment_method: sale.payment_method,
+          precio_venta_total: Number(sale.precio_venta_total),
+          monto_igv: Number(sale.monto_igv),
+          valor_venta: Number(sale.valor_venta),
+          client_name:
+            sale.client?.razon_social ||
+            sale.payment?.payer_name ||
+            'Público general',
+          created_at: sale.created_at,
+        })),
+      };
+    } catch (error) {
+      this.logger.error('Error al obtener ventas de caja actual', error);
+      throw new InternalServerErrorException(
+        'Error interno al obtener ventas de caja actual',
       );
     }
   }

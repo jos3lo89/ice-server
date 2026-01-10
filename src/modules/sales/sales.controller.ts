@@ -24,6 +24,7 @@ import { Role } from 'src/common/enums/role.enum';
 import { SalesQueryDto } from './dto/sales-query.dto';
 import { VoidSaleDto } from './dto/void-sale.dto';
 import { type Response } from 'express';
+import { type CurrentUserI } from 'src/common/interfaces/userActive.interface';
 
 @ApiTags('Gestión de Comprobantes')
 @Controller('sales')
@@ -252,10 +253,10 @@ export class SalesController {
   @ApiResponse({ status: 404, description: 'Venta no encontrada' })
   async void(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: CurrentUserI,
     @Body() voidSaleDto: VoidSaleDto,
   ) {
-    const result = await this.salesService.voidSale(id, userId, voidSaleDto);
+    const result = await this.salesService.voidSale(id, user.sub, voidSaleDto);
     return {
       success: true,
       data: result,

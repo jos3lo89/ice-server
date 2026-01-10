@@ -29,15 +29,8 @@ export class CashRegistersController {
   @Post('open')
   @Auth(Role.ADMIN, Role.CAJERO)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({
-    summary: 'Abrir caja',
-    description:
-      'Abre una nueva caja para el usuario actual. Solo puede haber una caja abierta por usuario. ADMIN y CAJERO.',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Caja abierta exitosamente',
-  })
+  @ApiOperation({ summary: 'Abrir caja' })
+  @ApiResponse({ status: 201, description: 'Caja abierta exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 403, description: 'Sin permisos' })
@@ -108,7 +101,7 @@ export class CashRegistersController {
   }
 
   @Get('today')
-  @Auth(Role.ADMIN)
+  @Auth(Role.ADMIN, Role.CAJERO)
   @ApiOperation({
     summary: 'Cajas del día',
     description: 'Obtiene todas las cajas abiertas hoy. Solo ADMIN.',
@@ -200,5 +193,21 @@ export class CashRegistersController {
     id: string,
   ) {
     return this.cashRegistersService.getSummary(id);
+  }
+
+  @Get('current/sales')
+  @RequireCashRegister()
+  @Auth(Role.ADMIN, Role.CAJERO)
+  @ApiOperation({
+    summary: 'Ventas de caja actual',
+    description:
+      'Obtiene todas las ventas de la caja abierta actual. ADMIN y CAJERO.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Ventas de caja actual obtenidas exitosamente',
+  })
+  async getCurrentSales(@CurrentUser() user: CurrentUserI) {
+    return this.cashRegistersService.getCurrentSales(user.sub);
   }
 }
